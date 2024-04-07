@@ -3,15 +3,21 @@
   "version": "0.0.1",
   "private": true,
   "description": "SimpleCov resultset diff action",
-  "main": "lib/main.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map",
-    "test": "jest",
-    "all": "pnpm run build && pnpm run format && pnpm run lint && pnpm run package && pnpm test"
+    "bundle": "pnpm run format:write && pnpm run package",
+    "ci-test": "npx jest",
+    "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
+    "format:write": "npx prettier --write .",
+    "format:check": "npx prettier --check .",
+    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+    "package": "npx ncc build src/index.ts -o dist --source-map --license licenses.txt",
+    "package:watch": "pnpm run package -- --watch",
+    "test": "npx jest",
+    "all": "pnpm run format:write && pnpm run lint && pnpm run test && pnpm run coverage && pnpm run package"
   },
   "repository": {
     "type": "git",
@@ -30,9 +36,10 @@
     "markdown-table": "^3.0.3"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.12.2",
-    "@typescript-eslint/parser": "^7.4.0",
+    "@types/node": "^20.12.5",
+    "@typescript-eslint/parser": "^7.5.0",
     "@vercel/ncc": "^0.38.1",
     "eslint": "^8.57.0",
     "eslint-plugin-github": "^4.10.2",
@@ -42,6 +49,6 @@
     "js-yaml": "^4.1.0",
     "prettier": "3.2.5",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   }
 }

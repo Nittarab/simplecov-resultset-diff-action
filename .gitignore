@@ -100,3 +100,4 @@ lib/**/*
 
 .idea
 .vscode
+/__tests__/main.test.js
