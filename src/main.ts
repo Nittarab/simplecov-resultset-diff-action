@@ -1,84 +1,52 @@
 import * as path from 'path'
-import * as fs from 'fs'
 import * as github from '@actions/github'
 import * as core from '@actions/core'
 import {markdownTable} from 'markdown-table'
-import {
-  ResultSet,
-  Coverage,
-  getCoverageDiff,
-  FileCoverageDiff
-} from './simplecov'
+import {Coverage, getCoverageDiff} from './simplecov'
+import {doesPathExists, formatDiff, parseResultset} from './utils'
 
 const WORKSPACE: string = process.env.GITHUB_WORKSPACE!
 
-function doesPathExists(filepath: string): void {
-  if (!fs.existsSync(filepath)) {
-    throw new Error(`${filepath} does not exist!`)
-  }
-}
-
-function parseResultset(resultsetPath: string): ResultSet {
-  const content = fs.readFileSync(path.resolve(WORKSPACE, resultsetPath))
-  return JSON.parse(content.toString()) as ResultSet
-}
-
-function truncPercentage(n: number): number {
-  return Math.sign(n) * (Math.trunc(Math.abs(n) * 10) / 10)
-}
-
-function badgeUrl(from: number, to: number): string {
-  const top =
-    'https://raw.githubusercontent.com/kzkn/simplecov-resultset-diff-action/main/assets'
-  const diff = Math.abs(truncPercentage(to - from))
-  if (diff === 0) {
-    return `${top}/0.svg`
-  } else {
-    const dir = Math.sign(to - from) < 0 ? 'down' : 'up'
-    const n = Math.trunc(diff)
-    const m = (diff * 10) % 10
-    return `${top}/${dir}/${n}/${n}.${m}.svg`
-  }
-}
-
-function formatDiffItem({
-  from,
-  to
-}: {
-  from: number | null
-  to: number | null
+export function calculateCoverageDiff(paths: {
+  base: string
+  head: string
 }): string {
-  let p = ''
-  let badge = ''
-  if (to !== null) {
-    p = ` ${truncPercentage(to)}%`
-  }
-  if (from !== null && to !== null) {
-    badge = ` ![${truncPercentage(to - from)}%](${badgeUrl(from, to)})`
-  }
-  const created = from === null && to !== null ? 'NEW' : ''
-  const deleted = from !== null && to === null ? 'DELETE' : ''
-  return `${created}${deleted}${p}${badge}`
-}
+  doesPathExists(paths.base)
+  doesPathExists(paths.head)
 
-function trimWorkspacePath(filename: string): string {
-  const workspace = `${WORKSPACE}/`
-  if (filename.startsWith(workspace)) {
-    return filename.slice(workspace.length)
+  const resultsets = {
+    base: parseResultset(paths.base, WORKSPACE),
+    head: parseResultset(paths.head, WORKSPACE)
+  }
+
+  const coverages = {
+    base: new Coverage(resultsets.base),
+    head: new Coverage(resultsets.head)
+  }
+
+  const diff = getCoverageDiff(coverages.base, coverages.head)
+
+  let content: string
+  if (diff.length === 0) {
+    content = 'No differences'
   } else {
-    return filename
+    content = markdownTable([
+      ['Filename', 'Lines', 'Branches'],
+      ...diff.map(d => formatDiff(d, WORKSPACE))
+    ])
   }
+
+  return `## Coverage difference
+${content}
+`
 }
 
-function formatDiff(diff: FileCoverageDiff): [string, string, string] {
-  return [
-    trimWorkspacePath(diff.filename),
-    formatDiffItem(diff.lines),
-    formatDiffItem(diff.branches)
-  ]
-}
-
-async function run(): Promise<void> {
+/**
+ * The run function is the main function of the action,
+ * it will be executed when the action is triggered.
+ *
+ */
+export async function run(): Promise<void> {
   try {
     const resultsetPaths = {
       base: core.getInput('base-resultset-path'),
@@ -90,34 +58,7 @@ async function run(): Promise<void> {
       head: path.resolve(process.cwd(), resultsetPaths.head)
     }
 
-    doesPathExists(paths.base)
-    doesPathExists(paths.head)
-
-    const resultsets = {
-      base: parseResultset(paths.base),
-      head: parseResultset(paths.head)
-    }
-
-    const coverages = {
-      base: new Coverage(resultsets.base),
-      head: new Coverage(resultsets.head)
-    }
-
-    const diff = getCoverageDiff(coverages.base, coverages.head)
-
-    let content: string
-    if (diff.length === 0) {
-      content = 'No differences'
-    } else {
-      content = markdownTable([
-        ['Filename', 'Lines', 'Branches'],
-        ...diff.map(formatDiff)
-      ])
-    }
-
-    const message = `## Coverage difference
-${content}
-`
+    const message = calculateCoverageDiff(paths)
 
     /**
      * Publish a comment in the PR with the diff result.
@@ -138,8 +79,9 @@ ${content}
       body: message
     })
   } catch (error) {
+    // @ts-ignore
     core.setFailed(error.message)
   }
 }
 
-run()
+export {Coverage, getCoverageDiff}
