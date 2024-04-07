@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as github from '@actions/github'
 import * as core from '@actions/core'
-import {markdownTable} from 'markdown-table'
+import {getMarkdownTable} from 'markdown-table-ts'
 import {Coverage, getCoverageDiff} from './simplecov'
 import {doesPathExists, formatDiff, parseResultset} from './utils'
 
@@ -30,10 +30,12 @@ export function calculateCoverageDiff(paths: {
   if (diff.length === 0) {
     content = 'No differences'
   } else {
-    content = markdownTable([
-      ['Filename', 'Lines', 'Branches'],
-      ...diff.map(d => formatDiff(d, WORKSPACE))
-    ])
+    content = getMarkdownTable({
+      table: {
+        head: ['Filename', 'Lines', 'Branches'],
+        body: diff.map(d => formatDiff(d, WORKSPACE))
+      }
+    })
   }
 
   return `## Coverage difference
