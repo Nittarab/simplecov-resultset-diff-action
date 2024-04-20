@@ -9,11 +9,8 @@ import * as fs from 'fs'
 
 jest.mock('@actions/github')
 jest.mock('@actions/core')
-jest.mock('../src/utils')
 
 describe('main.ts', () => {
-  const originalEnv = process.env
-
   const paths = {
     base: path.resolve(__dirname, './fixtures/resultset1.json'),
     head: path.resolve(__dirname, './fixtures/resultset2.json')
@@ -36,6 +33,7 @@ describe('main.ts', () => {
 
   test('calculateCoverageDiff returns expected output when there are differences', () => {
     const result = calculateCoverageDiff(paths)
+    console.log('result', result)
     expect(result).not.toBe('## Coverage difference\nNo differences\n')
   })
 

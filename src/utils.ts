@@ -13,7 +13,6 @@ export function parseResultset(
   resultsetPath: string,
   workspace: string
 ): ResultSet {
-  console.log('DEBUG!', path.resolve(resultsetPath))
   const content = fs.readFileSync(path.resolve(workspace, resultsetPath))
   return JSON.parse(content.toString()) as ResultSet
 }
