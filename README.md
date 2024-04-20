@@ -9,7 +9,7 @@ Creates a comment inside your Pull-Request with the difference between two Simpl
 To use this Github action, in your steps you may have:
 
 ```yml
-uses: kzkn/simplecov-resultset-diff-action@v1
+uses: nittarab/simplecov-resultset-diff-action@v1
 with:
   base-resultset-path: '/path/to/my/.resultset.json'
   head-resultset-path: '/path/to/my/.resultset.json'
@@ -47,7 +47,9 @@ jobs:
         run: bundle exec rspec
 ```
 
-Then we will use the Github Actions feature called "[artifacts](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/persisting-workflow-data-using-artifacts)" to store that `.resultset.json` file.
+Then we will use the Github Actions feature
+called "[artifacts](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/persisting-workflow-data-using-artifacts)"
+to store that `.resultset.json` file.
 
 ```yml
 - name: Upload coverage report
@@ -101,18 +103,20 @@ compare:
       with:
         name: head-result
 
-    - uses: kzkn/simplecov-resultset-diff-action@v1
+    - uses: nittarab/simplecov-resultset-diff-action@v1
       with:
         base-resultset-path: ./base-result/.resultset.json
         head-resultset-path: ./head-result/.resultset.json
         token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-That's it! When the compare job will be executed, it will post a comment in the current pull-request with the difference between the two resultset files.
+That's it! When the compare job will be executed, it will post a comment in the current pull-request with the difference
+between the two resultset files.
 
 ## Cache .resultset.json
 
-You can use the cached resultset file for comparison. To cache the resultset file that generated from the `build-base` job, it will save the build time.
+You can use the cached resultset file for comparison. To cache the resultset file that generated from the `build-base`
+job, it will save the build time.
 
 ```yml
 build-base:
@@ -148,6 +152,20 @@ build-base:
       with:
         name: base-result
         path: coverage/.resultset.json
+```
+
+## Development
+
+To run the tests:
+
+```bash
+pnpm test
+```
+
+To build the action:
+
+```bash
+pnpm bundle
 ```
 
 ## License

@@ -29389,14 +29389,9 @@ function calculateCoverageDiff(paths) {
     (0, utils_1.doesPathExists)(paths.head);
     const base_content = (0, utils_1.parseResultset)(paths.base, WORKSPACE);
     const head_content = (0, utils_1.parseResultset)(paths.head, WORKSPACE);
-    base_content;
-    console.log('2', base_content, head_content);
-    const coverages = {
-        //base: new Coverage(base_content),
-        base: new simplecov_1.Coverage(base_content),
-        head: new simplecov_1.Coverage(head_content)
-    };
-    const diff = (0, simplecov_1.getCoverageDiff)(coverages.base, coverages.head);
+    const coverageBase = new simplecov_1.Coverage(base_content);
+    const coverageHead = new simplecov_1.Coverage(head_content);
+    const diff = (0, simplecov_1.getCoverageDiff)(coverageBase, coverageHead);
     let content;
     if (diff.length === 0) {
         content = 'No differences';
@@ -29479,6 +29474,9 @@ function linesCoverage(coverage) {
     return floor((covered / rows) * 100, 2);
 }
 function branchesCoverages(coverage) {
+    if (!coverage) {
+        return 100;
+    }
     const conditions = Object.keys(coverage);
     if (conditions.length === 0) {
         return 100;
@@ -29506,7 +29504,7 @@ class Coverage {
                 this.files.push({
                     filename,
                     lines: linesCoverage(coverage.lines),
-                    branches: branchesCoverages(coverage.branches)
+                    branches: branchesCoverages(coverage.branches ?? {})
                 });
             }
         }
@@ -29614,7 +29612,7 @@ function truncPercentage(n) {
     return Math.sign(n) * (Math.trunc(Math.abs(n) * 10) / 10);
 }
 function badgeUrl(from, to) {
-    const top = 'https://raw.githubusercontent.com/kzkn/simplecov-resultset-diff-action/main/assets';
+    const top = 'https://raw.githubusercontent.com/nittarab/simplecov-resultset-diff-action/main/assets';
     const diff = Math.abs(truncPercentage(to - from));
     if (diff === 0) {
         return `${top}/0.svg`;
