@@ -1,11 +1,12 @@
-import * as path from 'path'
+import path from 'path'
 import * as github from '@actions/github'
 import * as core from '@actions/core'
 import {getMarkdownTable} from 'markdown-table-ts'
 import {Coverage, getCoverageDiff} from './simplecov'
 import {doesPathExists, formatDiff, parseResultset} from './utils'
 
-const WORKSPACE: string = process.env.GITHUB_WORKSPACE!
+const WORKSPACE =
+  process.env.NODE_ENV === 'test' ? '/' : process.env.GITHUB_WORKSPACE!
 
 export function calculateCoverageDiff(paths: {
   base: string
@@ -14,14 +15,15 @@ export function calculateCoverageDiff(paths: {
   doesPathExists(paths.base)
   doesPathExists(paths.head)
 
-  const resultsets = {
-    base: parseResultset(paths.base, WORKSPACE),
-    head: parseResultset(paths.head, WORKSPACE)
-  }
+  const base_content = parseResultset(paths.base, WORKSPACE)
+  const head_content = parseResultset(paths.head, WORKSPACE)
+
+  console.log('2', base_content, head_content)
 
   const coverages = {
-    base: new Coverage(resultsets.base),
-    head: new Coverage(resultsets.head)
+    //base: new Coverage(base_content),
+    base: new Coverage(base_content),
+    head: new Coverage(head_content)
   }
 
   const diff = getCoverageDiff(coverages.base, coverages.head)

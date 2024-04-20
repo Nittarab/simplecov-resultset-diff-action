@@ -3,6 +3,7 @@ import {FileCoverageDiff, ResultSet} from './simplecov'
 import path from 'path'
 
 export function doesPathExists(filepath: string): void {
+  // test throw new Error('Function not implemented.')
   if (!fs.existsSync(filepath)) {
     throw new Error(`${filepath} does not exist!`)
   }
@@ -12,6 +13,7 @@ export function parseResultset(
   resultsetPath: string,
   workspace: string
 ): ResultSet {
+  console.log('DEBUG!', path.resolve(resultsetPath))
   const content = fs.readFileSync(path.resolve(workspace, resultsetPath))
   return JSON.parse(content.toString()) as ResultSet
 }
