@@ -18,15 +18,10 @@ export function calculateCoverageDiff(paths: {
   const base_content = parseResultset(paths.base, WORKSPACE)
   const head_content = parseResultset(paths.head, WORKSPACE)
 
-  console.log('2', base_content, head_content)
+  const coverageBase = new Coverage(base_content)
+  const coverageHead = new Coverage(head_content)
 
-  const coverages = {
-    //base: new Coverage(base_content),
-    base: new Coverage(base_content),
-    head: new Coverage(head_content)
-  }
-
-  const diff = getCoverageDiff(coverages.base, coverages.head)
+  const diff = getCoverageDiff(coverageBase, coverageHead)
 
   let content: string
   if (diff.length === 0) {

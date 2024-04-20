@@ -16,45 +16,35 @@ describe('main.ts', () => {
     head: path.resolve(__dirname, './fixtures/resultset2.json')
   }
 
-  // const pathsIdentical = {
-  //   base: path.resolve(__dirname, './fixtures/resultset1.json'),
-  //   head: path.resolve(__dirname, './fixtures/resultset1.json')
-  // }
-  //
-  // const pathsNonExistent = {
-  //   base: path.resolve(__dirname, './fixtures/nonexistent.json'),
-  //   head: path.resolve(__dirname, './fixtures/nonexistent.json')
-  // }
-  //
-  // const pathsNotCoverage = {
-  //   base: path.resolve(__dirname, './fixtures/notcoverage.json'),
-  //   head: path.resolve(__dirname, './fixtures/notcoverage.json')
-  // }
+  const pathsIdentical = {
+    base: path.resolve(__dirname, './fixtures/resultset1.json'),
+    head: path.resolve(__dirname, './fixtures/resultset1.json')
+  }
+
+  const pathsNonExistent = {
+    base: path.resolve(__dirname, './fixtures/nonexistent.json'),
+    head: path.resolve(__dirname, './fixtures/nonexistent.json')
+  }
+  const pathsNotCoverage = {
+    base: path.resolve(__dirname, './fixtures/not_coverage.json'),
+    head: path.resolve(__dirname, './fixtures/resultset1.json')
+  }
 
   test('calculateCoverageDiff returns expected output when there are differences', () => {
     const result = calculateCoverageDiff(paths)
-    console.log('result', result)
     expect(result).not.toBe('## Coverage difference\nNo differences\n')
   })
 
-  // test('calculateCoverageDiff returns expected output when there are no differences', () => {
-  //   const result = calculateCoverageDiff(pathsIdentical)
-  //   expect(result).toBe('## Coverage difference\nNo differences\n')
-  // })
+  test('calculateCoverageDiff returns expected output when there are no differences', () => {
+    const result = calculateCoverageDiff(pathsIdentical)
+    expect(result).toBe('## Coverage difference\nNo differences\n')
+  })
+
+  test('calculateCoverageDiff throws error when paths do not exist', () => {
+    expect(() => calculateCoverageDiff(pathsNonExistent)).toThrow()
+  })
   //
-  // test('calculateCoverageDiff throws error when paths do not exist', () => {
-  //   expect(() => calculateCoverageDiff(pathsNonExistent)).toThrow()
-  // })
-  //
-  // test('calculateCoverageDiff throws error when paths are not coverage files', () => {
-  //   expect(() => calculateCoverageDiff(pathsNotCoverage)).toThrow()
-  // })
-  //
-  // test('run function posts a comment when a pull request ID is available', async () => {
-  //   github.context.issue.number = 1
-  //   await import('../src/main')
-  //   expect(
-  //     github.getOctokit(core.getInput('token')).rest.issues.createComment
-  //   ).toHaveBeenCalled()
-  // })
+  test('calculateCoverageDiff throws error when paths are not coverage files', () => {
+    expect(() => calculateCoverageDiff(pathsNotCoverage)).toThrow()
+  })
 })
