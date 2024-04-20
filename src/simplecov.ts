@@ -44,7 +44,11 @@ function linesCoverage(coverage: LineCoverage): number {
   return floor((covered / rows) * 100, 2)
 }
 
-function branchesCoverages(coverage: BranchCoverage): number {
+function branchesCoverages(coverage: BranchCoverage | undefined): number {
+  if (!coverage) {
+    return 100
+  }
+
   const conditions = Object.keys(coverage)
   if (conditions.length === 0) {
     return 100
@@ -71,11 +75,13 @@ export class Coverage {
   constructor(resultset: ResultSet) {
     this.files = []
     for (const coverages of Object.values(resultset)) {
-      for (const [filename, coverage] of Object.entries(coverages['coverage'])) {        
+      for (const [filename, coverage] of Object.entries(
+        coverages['coverage']
+      )) {
         this.files.push({
           filename,
           lines: linesCoverage(coverage.lines),
-          branches: branchesCoverages(coverage.branches)
+          branches: branchesCoverages(coverage.branches ?? {})
         })
       }
     }
