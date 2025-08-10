@@ -30147,7 +30147,7 @@ function calculateCoverageDiff(paths) {
         content = (0, markdown_table_ts_1.getMarkdownTable)({
             table: {
                 head: ['Filename', 'Lines', 'Branches'],
-                body: diff.map(d => (0, utils_1.formatDiff)(d, WORKSPACE))
+                body: diff.map((d) => (0, utils_1.formatDiff)(d, WORKSPACE))
             }
         });
     }
@@ -30189,7 +30189,7 @@ async function run() {
         });
     }
     catch (error) {
-        // @ts-ignore
+        // @ts-expect-error - error is unknown type from catch block
         core.setFailed(error.message);
     }
 }

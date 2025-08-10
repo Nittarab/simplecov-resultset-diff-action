@@ -1,11 +1,6 @@
 import * as path from 'path'
-import * as github from '@actions/github'
-import * as core from '@actions/core'
-import {Coverage, getCoverageDiff, calculateCoverageDiff} from '../src/main'
-import * as utils from '../src/utils'
-import {beforeEach} from 'jest-circus'
-import {beforeAll, jest} from '@jest/globals'
-import * as fs from 'fs'
+import {calculateCoverageDiff} from '../src/main'
+import {jest} from '@jest/globals'
 
 jest.mock('@actions/github')
 jest.mock('@actions/core')

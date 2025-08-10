@@ -1,27 +1,22 @@
-export type ResultSet = {
-  [command: string]: {
+export type ResultSet = Record<
+  string,
+  {
     coverage: RawCoverages
   }
-}
+>
 
-type RawCoverages = {
-  [filename: string]: RawCoverage
-}
+type RawCoverages = Record<string, RawCoverage>
 
-type RawCoverage = {
+interface RawCoverage {
   lines: LineCoverage
   branches: BranchCoverage
 }
 
 type LineCoverage = (number | null)[]
 
-type BranchCoverage = {
-  [condition: string]: {
-    [branch: string]: number
-  }
-}
+type BranchCoverage = Record<string, Record<string, number>>
 
-type FileCoverage = {
+interface FileCoverage {
   filename: string
   lines: number
   branches: number
@@ -139,7 +134,7 @@ function isDifference(cov1?: FileCoverage, cov2?: FileCoverage): boolean {
   return false
 }
 
-export type FileCoverageDiff = {
+export interface FileCoverageDiff {
   filename: string
   lines: {
     from: number | null
