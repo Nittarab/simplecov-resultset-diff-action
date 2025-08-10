@@ -2,7 +2,7 @@ import path from 'path'
 import * as github from '@actions/github'
 import * as core from '@actions/core'
 import {getMarkdownTable} from 'markdown-table-ts'
-import {Coverage, getCoverageDiff} from './simplecov'
+import {Coverage, getCoverageDiff, FileCoverageDiff} from './simplecov'
 import {doesPathExists, formatDiff, parseResultset} from './utils'
 
 const WORKSPACE =
@@ -30,7 +30,7 @@ export function calculateCoverageDiff(paths: {
     content = getMarkdownTable({
       table: {
         head: ['Filename', 'Lines', 'Branches'],
-        body: diff.map(d => formatDiff(d, WORKSPACE))
+        body: diff.map((d: FileCoverageDiff) => formatDiff(d, WORKSPACE))
       }
     })
   }
@@ -78,7 +78,7 @@ export async function run(): Promise<void> {
       body: message
     })
   } catch (error) {
-    // @ts-ignore
+    // @ts-expect-error - error is unknown type from catch block
     core.setFailed(error.message)
   }
 }
