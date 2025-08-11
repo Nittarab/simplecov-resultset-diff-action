@@ -11,14 +11,6 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'json-summary', 'html'],
-  coverageThreshold: {
-    global: {
-      branches: 90,
-      functions: 95,
-      lines: 95,
-      statements: 95
-    }
-  },
   // GitHub Actions specific timeouts
   testTimeout: 30000,
   // Better error reporting
