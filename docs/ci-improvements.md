@@ -8,7 +8,6 @@ The original CI configuration had several issues that made it confusing and less
 2. **Limited Testing**: Only tested on Ubuntu with Node.js 20
 3. **No Separation of Concerns**: All testing was lumped together
 4. **No Build Validation**: No check that the `dist/` folder was up-to-date
-5. **No Release Automation**: Manual release process
 
 ## Improvements Made
 
@@ -36,13 +35,7 @@ The original CI configuration had several issues that made it confusing and less
 - Clear separation between test failures and build issues
 - Proper error messages for common issues
 
-### 5. **Release Automation**
-
-- Automated release workflow triggered by version tags
-- Automatic major version tag updates (e.g., v1, v2)
-- Standardized release notes generation
-
-### 6. **Documentation Updates**
+### 5. **Documentation Updates**
 
 - Updated README with new dry-run capability
 - Added comprehensive development section
@@ -51,7 +44,6 @@ The original CI configuration had several issues that made it confusing and less
 ## Key Files Changed
 
 - `.github/workflows/ci.yml` - Complete CI pipeline overhaul
-- `.github/workflows/release.yml` - New release automation
 - `src/main.ts` - Added dry-run mode support
 - `action.yml` - Made token optional for dry-run mode
 - `README.md` - Updated documentation
@@ -62,25 +54,28 @@ The original CI configuration had several issues that made it confusing and less
 1. **Clearer CI Results**: No more confusing comments during CI
 2. **Better Quality**: Multi-version and multi-OS testing
 3. **Faster Development**: Separate jobs allow parallel execution
-4. **Automated Releases**: Consistent versioning and release process
-5. **Better Documentation**: Clear guidance for contributors
+4. **Better Documentation**: Clear guidance for contributors
 
 ## Migration Guide
 
-For users of this action, the only change is that the `token` parameter is now optional:
+For users of this action, there are no breaking changes. The action works exactly the same as before.
+
+New dry-run capability can be enabled via environment variable:
 
 ```yaml
-# Before: token was required
+# Normal operation (unchanged)
 - uses: nittarab/simplecov-resultset-diff-action@v1
   with:
     base-resultset-path: ./base/.resultset.json
     head-resultset-path: ./head/.resultset.json
     token: ${{ secrets.GITHUB_TOKEN }}
 
-# After: token is optional (enables dry-run mode)
+# New: dry-run mode (for testing)
 - uses: nittarab/simplecov-resultset-diff-action@v1
+  env:
+    DRY_RUN: true
   with:
     base-resultset-path: ./base/.resultset.json
     head-resultset-path: ./head/.resultset.json
-    # token: ${{ secrets.GITHUB_TOKEN }}  # Optional
+    token: ${{ secrets.GITHUB_TOKEN }}
 ```
