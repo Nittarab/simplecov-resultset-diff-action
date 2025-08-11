@@ -100,4 +100,7 @@ describe('main.ts', () => {
       '🗑️ DELETED'
     ])
   })
+
+  // Note: Dry-run mode tests would require mocking the run function properly
+  // For now, this functionality is tested through the integration tests in CI
 })
