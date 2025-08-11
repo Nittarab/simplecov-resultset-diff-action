@@ -63,13 +63,8 @@ describe('Dry-run mode', () => {
   test('should not run in dry-run mode when DRY_RUN is not set', async () => {
     delete process.env.DRY_RUN
 
-    // Mock GitHub context to avoid creating actual PR comment
-    const mockGitHub = require('@actions/github')
-    mockGitHub.context = {
-      issue: {number: null}, // No PR number to simulate warning case
-      repo: {owner: 'test', repo: 'test'}
-    }
-
+    // This test would normally try to post a comment, but will hit the warning case
+    // since there's no PR context in the test environment
     await run()
 
     expect(mockInfo).not.toHaveBeenCalledWith(

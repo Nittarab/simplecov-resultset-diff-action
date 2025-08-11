@@ -1,9 +1,7 @@
 import * as path from 'path'
-import {calculateCoverageDiff, run} from '../src/main'
+import {calculateCoverageDiff} from '../src/main'
 import {formatDiff} from '../src/utils'
 import {jest} from '@jest/globals'
-import * as core from '@actions/core'
-import * as github from '@actions/github'
 
 jest.mock('@actions/github')
 jest.mock('@actions/core')
