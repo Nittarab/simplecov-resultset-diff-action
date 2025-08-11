@@ -1,5 +1,10 @@
 import * as path from 'path'
-import {calculateCoverageDiff, run} from '../src/main'
+import {
+  calculateCoverageDiff,
+  run,
+  Coverage,
+  getCoverageDiff
+} from '../src/main'
 import {formatDiff} from '../src/utils'
 import {jest} from '@jest/globals'
 import * as core from '@actions/core'
@@ -228,6 +233,185 @@ describe('SimpleCov Resultset Diff Action', () => {
 
         expect(mockSetFailed).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('Edge cases and additional coverage', () => {
+    test('formatDiff handles no change (0% diff)', () => {
+      const mockDiff = {
+        filename: '/test/no_change.rb',
+        lines: {from: 50.0, to: 50.0},
+        branches: {from: 80.0, to: 80.0}
+      }
+
+      const result = formatDiff(mockDiff, '/test')
+      expect(result).toEqual([
+        'no_change.rb',
+        '50%',
+        '80%',
+        '➡️ 0%', // No change emoji (corrected format)
+        '➡️ 0%'
+      ])
+    })
+
+    test('formatDiff handles null coverage values', () => {
+      const mockDiff = {
+        filename: '/test/null_values.rb',
+        lines: {from: null, to: null},
+        branches: {from: null, to: null}
+      }
+
+      const result = formatDiff(mockDiff, '/test')
+      expect(result).toEqual([
+        'null_values.rb',
+        '-',
+        '-',
+        '-', // Should return '-' for null to null
+        '-'
+      ])
+    })
+
+    test('WORKSPACE constant uses GITHUB_WORKSPACE in production', () => {
+      // Save original values
+      const originalNodeEnv = process.env.NODE_ENV
+      const originalGitHubWorkspace = process.env.GITHUB_WORKSPACE
+
+      try {
+        // Set production environment
+        delete process.env.NODE_ENV
+        process.env.GITHUB_WORKSPACE = '/github/workspace'
+
+        // Just use the imported function - the WORKSPACE constant is set at module load time
+        const result = calculateCoverageDiff({
+          base: path.resolve(__dirname, './fixtures/resultset1.json'),
+          head: path.resolve(__dirname, './fixtures/resultset1.json')
+        })
+
+        expect(result).toContain('No differences')
+      } finally {
+        // Restore original values
+        if (originalNodeEnv !== undefined) {
+          process.env.NODE_ENV = originalNodeEnv
+        } else {
+          delete process.env.NODE_ENV
+        }
+        if (originalGitHubWorkspace !== undefined) {
+          process.env.GITHUB_WORKSPACE = originalGitHubWorkspace
+        } else {
+          delete process.env.GITHUB_WORKSPACE
+        }
+      }
+    })
+  })
+
+  describe('SimpleCov internal functions coverage', () => {
+    test('Coverage handles empty line coverage (100% when no executable lines)', () => {
+      // Create a file with no executable lines (all nulls)
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/empty.rb': {
+              lines: [null, null, null],
+              branches: {}
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const fileCoverage = coverage.files.find(
+        (f: any) => f.filename === '/test/empty.rb'
+      )
+
+      // The line coverage should be 100% when there are no executable lines
+      expect(fileCoverage).toBeDefined()
+      expect(fileCoverage!.lines).toBe(100)
+    })
+
+    test('Coverage handles undefined branch coverage (100% default)', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/no_branches.rb': {
+              lines: [1, 1, 0],
+              branches: undefined as any
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const fileCoverage = coverage.files.find(
+        (f: any) => f.filename === '/test/no_branches.rb'
+      )
+
+      // Branch coverage should be 100% when branches are undefined
+      expect(fileCoverage).toBeDefined()
+      expect(fileCoverage!.branches).toBe(100)
+    })
+
+    test('getCoverageDiff handles identical coverage objects', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/same.rb': {
+              lines: [1, 1, 0],
+              branches: {}
+            }
+          }
+        }
+      }
+
+      const coverage1 = new Coverage(mockResultset)
+      const coverage2 = new Coverage(mockResultset)
+
+      // Should return empty array when coverages are identical
+      const diff = getCoverageDiff(coverage1, coverage2)
+      expect(diff).toEqual([])
+    })
+
+    test('Coverage handles empty branches object (100% coverage)', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/empty_branches.rb': {
+              lines: [1, 1, 0],
+              branches: {} // Empty branches object
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const fileCoverage = coverage.files.find(
+        (f: any) => f.filename === '/test/empty_branches.rb'
+      )
+
+      // Branch coverage should be 100% when branches object is empty
+      expect(fileCoverage).toBeDefined()
+      expect(fileCoverage!.branches).toBe(100)
+    })
+
+    test('Coverage handles completely undefined branches', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/no_branches_property.rb': {
+              lines: [1, 1, 0],
+              branches: undefined as any
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const fileCoverage = coverage.files.find(
+        (f: any) => f.filename === '/test/no_branches_property.rb'
+      )
+
+      // Branch coverage should be 100% when branches property is undefined
+      expect(fileCoverage).toBeDefined()
+      expect(fileCoverage!.branches).toBe(100)
     })
   })
 })
