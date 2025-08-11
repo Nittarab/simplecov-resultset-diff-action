@@ -101,3 +101,6 @@ lib/**/*
 .idea
 .vscode
 /__tests__/main.test.js
+
+# Local workflow testing
+tmp/

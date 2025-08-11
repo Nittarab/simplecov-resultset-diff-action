@@ -110,4 +110,7 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
       expect(result).toMatch(/\|.*Branch Diff.*\|/)
     })
   })
+
+  // Note: Dry-run mode tests would require mocking the run function properly
+  // For now, this functionality is tested through the integration tests in CI
 })
