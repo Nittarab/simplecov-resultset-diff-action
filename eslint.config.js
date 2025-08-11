@@ -64,7 +64,8 @@ module.exports = [
     },
     rules: {
       ...jest.configs.recommended.rules,
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-namespace': 'off'
     }
   },
   {
