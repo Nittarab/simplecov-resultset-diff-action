@@ -1,8 +1,6 @@
 import * as path from 'path'
 import {calculateCoverageDiff} from '../src/main'
 import {jest} from '@jest/globals'
-import * as core from '@actions/core'
-import * as github from '@actions/github'
 import {setupTestEnvironment} from './test-helpers'
 
 // Mock the GitHub Actions modules
@@ -36,7 +34,7 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
       expect(result).toContain('Line Diff')
       expect(result).toContain('Branch Diff')
       expect(result).toContain('📈')
-      expect(result).toContain('📉') 
+      expect(result).toContain('📉')
       expect(result).toContain('🆕 NEW')
       expect(result).toContain('🗑️ DELETED')
       expect(result).not.toBe('## Coverage difference\nNo differences\n')
@@ -117,7 +115,7 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
 
   // Note: Coverage, getCoverageDiff, and formatDiff functions are comprehensively tested
   // in their respective dedicated test files (simplecov.test.ts and utils.test.ts)
-  
+
   // Note: Dry-run mode tests would require mocking the run function properly
   // For now, this functionality is tested through the integration tests in CI
 })

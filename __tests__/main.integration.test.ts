@@ -1,5 +1,5 @@
 import * as path from 'path'
-import {calculateCoverageDiff, run} from '../src/main'
+import {run} from '../src/main'
 import {jest} from '@jest/globals'
 import * as core from '@actions/core'
 import * as github from '@actions/github'

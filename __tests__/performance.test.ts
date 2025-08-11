@@ -1,7 +1,6 @@
 import {calculateCoverageDiff} from '../src/main'
 import {Coverage, getCoverageDiff} from '../src/simplecov'
 import {createMockResultset} from './test-helpers'
-import * as fs from 'fs'
 import * as path from 'path'
 
 describe('Performance and Stress Tests', () => {
@@ -53,7 +52,7 @@ describe('Performance and Stress Tests', () => {
         const startTime = Date.now()
 
         // Create two large resultsets with slight differences
-        const createLargeSet = (variant: number) =>
+        const createLargeSet = (variant: number): any =>
           createMockResultset(
             Object.fromEntries(
               Array.from({length: 500}, (_, i) => [
