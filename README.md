@@ -24,6 +24,23 @@ with:
 | head-stats-path | true     |         | Path to the SimpleCov generated "resultset.json" file from the head branch.                   |
 | token           | true     |         | Github token so the package can publish a comment in the pull-request when the diff is ready. |
 
+## Dry-Run Mode
+
+You can run the action in dry-run mode by setting the `DRY_RUN` environment variable to `true` or `1`. In dry-run mode, the action will calculate and log the coverage diff but won't post any comments to the PR.
+
+```yml
+- name: Coverage Diff (Dry Run)
+  uses: nittarab/simplecov-resultset-diff-action@v1
+  env:
+    DRY_RUN: true
+  with:
+    base-resultset-path: base-result/.resultset.json
+    head-resultset-path: head-result/.resultset.json
+    token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+This is useful for testing the action or when you want to see the coverage diff without posting comments.
+
 ## Usage example
 
 If you want to compare the coverage difference between your base branch and your pull-request head branch.

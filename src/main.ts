@@ -65,10 +65,22 @@ export async function run(): Promise<void> {
 
     const message = calculateCoverageDiff(paths)
 
+    const token = core.getInput('token')
+
+    // Check if we're in dry-run mode via environment variable
+    const isDryRun = process.env.DRY_RUN === 'true' || process.env.DRY_RUN === '1'
+    
+    if (isDryRun) {
+      core.info('Running in dry-run mode (DRY_RUN environment variable set)')
+      core.info('Coverage diff result:')
+      core.info(message)
+      return
+    }
+
     /**
      * Publish a comment in the PR with the diff result.
      */
-    const octokit = github.getOctokit(core.getInput('token'))
+    const octokit = github.getOctokit(token)
 
     const pullRequestId = github.context.issue.number
     if (!pullRequestId) {
