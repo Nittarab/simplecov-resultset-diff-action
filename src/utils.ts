@@ -21,38 +21,50 @@ function truncPercentage(n: number): number {
   return Math.sign(n) * (Math.trunc(Math.abs(n) * 10) / 10)
 }
 
-function badgeUrl(from: number, to: number): string {
-  const top =
-    'https://raw.githubusercontent.com/nittarab/simplecov-resultset-diff-action/main/assets'
-  const diff = Math.abs(truncPercentage(to - from))
-  if (diff === 0) {
-    return `${top}/0.svg`
-  } else {
-    const dir = Math.sign(to - from) < 0 ? 'down' : 'up'
-    const n = Math.trunc(diff)
-    const m = (diff * 10) % 10
-    return `${top}/${dir}/${n}/${n}.${m}.svg`
-  }
+function getChangeEmoji(diff: number): string {
+  if (diff > 0) return '📈'
+  if (diff < 0) return '📉'
+  return '➡️'
 }
 
-function formatDiffItem({
+function formatPercentage(value: number | null): string {
+  if (value === null) return '-'
+  return `${truncPercentage(value)}%`
+}
+
+function formatPercentageDiff(diff: number): string {
+  if (diff === 0) return '➡️ 0%'
+  const emoji = getChangeEmoji(diff)
+  const sign = diff > 0 ? '+' : ''
+  return `${emoji} ${sign}${truncPercentage(diff)}%`
+}
+
+function formatCoverageValue({
   from,
   to
 }: {
   from: number | null
   to: number | null
 }): string {
-  let p = ''
-  let badge = ''
   if (to !== null) {
-    p = ` ${truncPercentage(to)}%`
+    return formatPercentage(to)
   }
+  return from !== null ? 'DELETED' : '-'
+}
+
+function formatCoverageDiff({
+  from,
+  to
+}: {
+  from: number | null
+  to: number | null
+}): string {
+  if (from === null && to !== null) return '🆕 NEW'
+  if (from !== null && to === null) return '🗑️ DELETED'
   if (from !== null && to !== null) {
-    badge = ` ![${truncPercentage(to - from)}%](${badgeUrl(from, to)})`
+    return formatPercentageDiff(to - from)
   }
-  const created = from === null && to !== null ? 'NEW' : ''
-  const deleted = from !== null && to === null ? 'DELETE' : ''
-  return `${created}${deleted}${p}${badge}`
+  return '-'
 }
 
 function trimWorkspacePath(filename: string, workspace: string): string {
@@ -67,10 +79,12 @@ function trimWorkspacePath(filename: string, workspace: string): string {
 export function formatDiff(
   diff: FileCoverageDiff,
   workspace: string
-): [string, string, string] {
+): [string, string, string, string, string] {
   return [
     trimWorkspacePath(diff.filename, workspace),
-    formatDiffItem(diff.lines),
-    formatDiffItem(diff.branches)
+    formatCoverageValue(diff.lines),
+    formatCoverageValue(diff.branches),
+    formatCoverageDiff(diff.lines),
+    formatCoverageDiff(diff.branches)
   ]
 }

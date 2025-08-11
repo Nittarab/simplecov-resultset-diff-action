@@ -29,7 +29,13 @@ export function calculateCoverageDiff(paths: {
   } else {
     content = getMarkdownTable({
       table: {
-        head: ['Filename', 'Lines', 'Branches'],
+        head: [
+          'Filename',
+          'Line Coverage',
+          'Branch Coverage',
+          'Line Diff',
+          'Branch Diff'
+        ],
         body: diff.map((d: FileCoverageDiff) => formatDiff(d, WORKSPACE))
       }
     })

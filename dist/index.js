@@ -30146,7 +30146,13 @@ function calculateCoverageDiff(paths) {
     else {
         content = (0, markdown_table_ts_1.getMarkdownTable)({
             table: {
-                head: ['Filename', 'Lines', 'Branches'],
+                head: [
+                    'Filename',
+                    'Line Coverage',
+                    'Branch Coverage',
+                    'Line Diff',
+                    'Branch Diff'
+                ],
                 body: diff.map((d) => (0, utils_1.formatDiff)(d, WORKSPACE))
             }
         });
@@ -30356,31 +30362,40 @@ function parseResultset(resultsetPath, workspace) {
 function truncPercentage(n) {
     return Math.sign(n) * (Math.trunc(Math.abs(n) * 10) / 10);
 }
-function badgeUrl(from, to) {
-    const top = 'https://raw.githubusercontent.com/nittarab/simplecov-resultset-diff-action/main/assets';
-    const diff = Math.abs(truncPercentage(to - from));
-    if (diff === 0) {
-        return `${top}/0.svg`;
-    }
-    else {
-        const dir = Math.sign(to - from) < 0 ? 'down' : 'up';
-        const n = Math.trunc(diff);
-        const m = (diff * 10) % 10;
-        return `${top}/${dir}/${n}/${n}.${m}.svg`;
-    }
+function getChangeEmoji(diff) {
+    if (diff > 0)
+        return '📈';
+    if (diff < 0)
+        return '📉';
+    return '➡️';
 }
-function formatDiffItem({ from, to }) {
-    let p = '';
-    let badge = '';
+function formatPercentage(value) {
+    if (value === null)
+        return '-';
+    return `${truncPercentage(value)}%`;
+}
+function formatPercentageDiff(diff) {
+    if (diff === 0)
+        return '➡️ 0%';
+    const emoji = getChangeEmoji(diff);
+    const sign = diff > 0 ? '+' : '';
+    return `${emoji} ${sign}${truncPercentage(diff)}%`;
+}
+function formatCoverageValue({ from, to }) {
     if (to !== null) {
-        p = ` ${truncPercentage(to)}%`;
+        return formatPercentage(to);
     }
+    return from !== null ? 'DELETED' : '-';
+}
+function formatCoverageDiff({ from, to }) {
+    if (from === null && to !== null)
+        return '🆕 NEW';
+    if (from !== null && to === null)
+        return '🗑️ DELETED';
     if (from !== null && to !== null) {
-        badge = ` ![${truncPercentage(to - from)}%](${badgeUrl(from, to)})`;
+        return formatPercentageDiff(to - from);
     }
-    const created = from === null && to !== null ? 'NEW' : '';
-    const deleted = from !== null && to === null ? 'DELETE' : '';
-    return `${created}${deleted}${p}${badge}`;
+    return '-';
 }
 function trimWorkspacePath(filename, workspace) {
     const workspace_path = `${workspace}/`;
@@ -30394,8 +30409,10 @@ function trimWorkspacePath(filename, workspace) {
 function formatDiff(diff, workspace) {
     return [
         trimWorkspacePath(diff.filename, workspace),
-        formatDiffItem(diff.lines),
-        formatDiffItem(diff.branches)
+        formatCoverageValue(diff.lines),
+        formatCoverageValue(diff.branches),
+        formatCoverageDiff(diff.lines),
+        formatCoverageDiff(diff.branches)
     ];
 }
 
