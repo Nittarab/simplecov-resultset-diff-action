@@ -16,7 +16,7 @@ type LineCoverage = (number | null)[]
 
 type BranchCoverage = Record<string, Record<string, number>>
 
-interface FileCoverage {
+export interface FileCoverage {
   filename: string
   lines: number
   branches: number

@@ -1,4 +1,4 @@
-import {Coverage, getCoverageDiff} from '../src/simplecov'
+import {Coverage, getCoverageDiff, FileCoverage} from '../src/simplecov'
 
 describe('SimpleCov Coverage Engine', () => {
   describe('Coverage class', () => {
@@ -16,7 +16,7 @@ describe('SimpleCov Coverage Engine', () => {
 
       const coverage = new Coverage(mockResultset)
       const fileCoverage = coverage.files.find(
-        (f: any) => f.filename === '/test/empty.rb'
+        (f: FileCoverage) => f.filename === '/test/empty.rb'
       )
 
       expect(fileCoverage).toBeDefined()
@@ -29,15 +29,15 @@ describe('SimpleCov Coverage Engine', () => {
           coverage: {
             '/test/no_branches.rb': {
               lines: [1, 1, 0],
-              branches: undefined as any
-            }
+              branches: undefined
+            } as any
           }
         }
       }
 
       const coverage = new Coverage(mockResultset)
       const fileCoverage = coverage.files.find(
-        (f: any) => f.filename === '/test/no_branches.rb'
+        (f: FileCoverage) => f.filename === '/test/no_branches.rb'
       )
 
       expect(fileCoverage).toBeDefined()
@@ -58,7 +58,7 @@ describe('SimpleCov Coverage Engine', () => {
 
       const coverage = new Coverage(mockResultset)
       const fileCoverage = coverage.files.find(
-        (f: any) => f.filename === '/test/empty_branches.rb'
+        (f: FileCoverage) => f.filename === '/test/empty_branches.rb'
       )
 
       expect(fileCoverage).toBeDefined()
@@ -79,7 +79,7 @@ describe('SimpleCov Coverage Engine', () => {
 
       const coverage = new Coverage(mockResultset)
       const fileCoverage = coverage.files.find(
-        (f: any) => f.filename === '/test/mixed.rb'
+        (f: FileCoverage) => f.filename === '/test/mixed.rb'
       )
 
       expect(fileCoverage).toBeDefined()
@@ -109,7 +109,7 @@ describe('SimpleCov Coverage Engine', () => {
 
       const coverage = new Coverage(mockResultset)
       const fileCoverage = coverage.files.find(
-        (f: any) => f.filename === '/test/branches.rb'
+        (f: FileCoverage) => f.filename === '/test/branches.rb'
       )
 
       expect(fileCoverage).toBeDefined()
