@@ -1,0 +1,85 @@
+name: 'Release'
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  release:
+    name: 'Create Release'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and test
+        run: npm run all
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update major version tag
+        run: |
+          TAG=${{ steps.tag.outputs.tag }}
+          MAJOR_VERSION=${TAG%%.*}
+
+          # Delete existing major version tag if it exists
+          git tag -d $MAJOR_VERSION 2>/dev/null || true
+          git push origin :refs/tags/$MAJOR_VERSION 2>/dev/null || true
+
+          # Create new major version tag
+          git tag $MAJOR_VERSION
+          git push origin $MAJOR_VERSION
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          release_name: ${{ steps.tag.outputs.tag }}
+          draft: false
+          prerelease: false
+          body: |
+            ## Changes
+
+            See the full changelog at: https://github.com/${{ github.repository }}/compare/${{ steps.tag.outputs.tag }}
+
+            ## Usage
+
+            ```yaml
+            - uses: ${{ github.repository }}@${{ steps.tag.outputs.tag }}
+              with:
+                base-resultset-path: ./base/.resultset.json
+                head-resultset-path: ./head/.resultset.json
+                token: ${{ secrets.GITHUB_TOKEN }}
+            ```
