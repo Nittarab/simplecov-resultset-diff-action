@@ -68,8 +68,9 @@ export async function run(): Promise<void> {
     const token = core.getInput('token')
 
     // Check if we're in dry-run mode via environment variable
-    const isDryRun = process.env.DRY_RUN === 'true' || process.env.DRY_RUN === '1'
-    
+    const isDryRun =
+      process.env.DRY_RUN === 'true' || process.env.DRY_RUN === '1'
+
     if (isDryRun) {
       core.info('Running in dry-run mode (DRY_RUN environment variable set)')
       core.info('Coverage diff result:')

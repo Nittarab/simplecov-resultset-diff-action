@@ -80,7 +80,7 @@ jobs:
       - name: Check dist is up-to-date
         run: |
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build. Please run 'npm run package' locally and commit the changes."
+            echo "Detected uncommitted changes after build. Please run 'npm run all' locally and commit the changes."
             git diff --text dist/
             exit 1
           fi
@@ -103,21 +103,23 @@ jobs:
       - name: Test action with coverage difference (dry-run)
         id: diff-test
         uses: ./
+        env:
+          DRY_RUN: true
         with:
           base-resultset-path: .github/fixtures/prod1.json
           head-resultset-path: .github/fixtures/prod2.json
-          # Use dry-run mode to avoid posting actual comments during CI
-          token: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Test action with no coverage difference (dry-run)
         id: no-diff-test
         uses: ./
+        env:
+          DRY_RUN: true
         with:
           base-resultset-path: .github/fixtures/prod1.json
           head-resultset-path: .github/fixtures/prod1.json
-          # Use dry-run mode to avoid posting actual comments during CI
-          token: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Validate integration test results

@@ -33,9 +33,13 @@ describe('Dry-run mode', () => {
 
     await run()
 
-    expect(mockInfo).toHaveBeenCalledWith('Running in dry-run mode (DRY_RUN environment variable set)')
+    expect(mockInfo).toHaveBeenCalledWith(
+      'Running in dry-run mode (DRY_RUN environment variable set)'
+    )
     expect(mockInfo).toHaveBeenCalledWith('Coverage diff result:')
-    expect(mockInfo).toHaveBeenCalledWith(expect.stringContaining('Coverage difference'))
+    expect(mockInfo).toHaveBeenCalledWith(
+      expect.stringContaining('Coverage difference')
+    )
 
     delete process.env.DRY_RUN
   })
@@ -45,9 +49,13 @@ describe('Dry-run mode', () => {
 
     await run()
 
-    expect(mockInfo).toHaveBeenCalledWith('Running in dry-run mode (DRY_RUN environment variable set)')
+    expect(mockInfo).toHaveBeenCalledWith(
+      'Running in dry-run mode (DRY_RUN environment variable set)'
+    )
     expect(mockInfo).toHaveBeenCalledWith('Coverage diff result:')
-    expect(mockInfo).toHaveBeenCalledWith(expect.stringContaining('Coverage difference'))
+    expect(mockInfo).toHaveBeenCalledWith(
+      expect.stringContaining('Coverage difference')
+    )
 
     delete process.env.DRY_RUN
   })
@@ -58,12 +66,14 @@ describe('Dry-run mode', () => {
     // Mock GitHub context to avoid creating actual PR comment
     const mockGitHub = require('@actions/github')
     mockGitHub.context = {
-      issue: { number: null }, // No PR number to simulate warning case
-      repo: { owner: 'test', repo: 'test' }
+      issue: {number: null}, // No PR number to simulate warning case
+      repo: {owner: 'test', repo: 'test'}
     }
 
     await run()
 
-    expect(mockInfo).not.toHaveBeenCalledWith('Running in dry-run mode (DRY_RUN environment variable set)')
+    expect(mockInfo).not.toHaveBeenCalledWith(
+      'Running in dry-run mode (DRY_RUN environment variable set)'
+    )
   })
 })
