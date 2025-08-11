@@ -93,13 +93,13 @@ describe('SimpleCov Coverage Engine', () => {
             '/test/branches.rb': {
               lines: [1, 1, 1],
               branches: {
-                'condition1': {
-                  'branch1': 1, // covered
-                  'branch2': 0  // not covered
+                condition1: {
+                  branch1: 1, // covered
+                  branch2: 0 // not covered
                 },
-                'condition2': {
-                  'branch3': 1, // covered
-                  'branch4': 1  // covered
+                condition2: {
+                  branch3: 1, // covered
+                  branch4: 1 // covered
                 }
               }
             }

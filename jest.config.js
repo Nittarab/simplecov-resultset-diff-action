@@ -24,8 +24,5 @@ module.exports = {
   // Better error reporting
   verbose: true,
   // Test matching patterns
-  testMatch: [
-    '**/__tests__/**/*.test.ts',
-    '**/*.test.ts'
-  ]
+  testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts']
 }

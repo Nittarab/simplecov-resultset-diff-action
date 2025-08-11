@@ -11,11 +11,11 @@ describe('Utils - Formatting Functions', () => {
 
       const result = formatDiff(mockDiff, '/test')
       expect(result).toEqual([
-        'file.rb',     // filename
-        '60%',         // line coverage
-        '70%',         // branch coverage
-        '📈 +10%',     // line diff (increase)
-        '📉 -10%'      // branch diff (decrease)
+        'file.rb', // filename
+        '60%', // line coverage
+        '70%', // branch coverage
+        '📈 +10%', // line diff (increase)
+        '📉 -10%' // branch diff (decrease)
       ])
     })
 
@@ -55,13 +55,7 @@ describe('Utils - Formatting Functions', () => {
       }
 
       const result = formatDiff(mockDiff, '/test')
-      expect(result).toEqual([
-        'no_change.rb',
-        '50%',
-        '80%',
-        '➡️ 0%',
-        '➡️ 0%'
-      ])
+      expect(result).toEqual(['no_change.rb', '50%', '80%', '➡️ 0%', '➡️ 0%'])
     })
 
     test('handles null coverage values', () => {
@@ -72,13 +66,7 @@ describe('Utils - Formatting Functions', () => {
       }
 
       const result = formatDiff(mockDiff, '/test')
-      expect(result).toEqual([
-        'null_values.rb',
-        '-',
-        '-',
-        '-',
-        '-'
-      ])
+      expect(result).toEqual(['null_values.rb', '-', '-', '-', '-'])
     })
 
     test('properly trims workspace paths', () => {

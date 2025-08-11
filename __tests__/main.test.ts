@@ -28,7 +28,7 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
         base: fixtures.base,
         head: fixtures.head
       })
-      
+
       expect(result).toContain('Coverage difference')
       expect(result).toContain('Filename')
       expect(result).toContain('Line Coverage')
@@ -47,22 +47,26 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
         base: fixtures.identical,
         head: fixtures.identical
       })
-      
+
       expect(result).toBe('## Coverage difference\nNo differences\n')
     })
 
     test('throws error when paths do not exist', () => {
-      expect(() => calculateCoverageDiff({
-        base: fixtures.nonExistent,
-        head: fixtures.nonExistent
-      })).toThrow()
+      expect(() =>
+        calculateCoverageDiff({
+          base: fixtures.nonExistent,
+          head: fixtures.nonExistent
+        })
+      ).toThrow()
     })
 
     test('throws error when paths are not coverage files', () => {
-      expect(() => calculateCoverageDiff({
-        base: fixtures.notCoverage,
-        head: fixtures.base
-      })).toThrow()
+      expect(() =>
+        calculateCoverageDiff({
+          base: fixtures.notCoverage,
+          head: fixtures.base
+        })
+      ).toThrow()
     })
 
     test('handles workspace path resolution correctly', () => {
@@ -101,7 +105,7 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
         base: fixtures.base,
         head: fixtures.head
       })
-      
+
       // Should contain markdown table structure
       expect(result).toMatch(/\|.*Filename.*\|/)
       expect(result).toMatch(/\|.*Line Coverage.*\|/)

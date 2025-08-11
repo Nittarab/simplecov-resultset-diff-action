@@ -5,7 +5,7 @@ import {jest} from '@jest/globals'
 beforeEach(() => {
   // Clear all mocks before each test
   jest.clearAllMocks()
-  
+
   // Reset environment variables
   delete process.env.DRY_RUN
   delete process.env.GITHUB_WORKSPACE
@@ -25,22 +25,22 @@ afterAll(() => {
 // Add custom matchers for better assertions
 expect.extend({
   toBeValidCoverageDiff(received: string) {
-    const pass = received.includes('Coverage difference') &&
-                 (received.includes('No differences') || 
-                  received.includes('Filename'))
-    
+    const pass =
+      received.includes('Coverage difference') &&
+      (received.includes('No differences') || received.includes('Filename'))
+
     if (pass) {
       return {
         message: () => `expected ${received} not to be a valid coverage diff`,
-        pass: true,
+        pass: true
       }
     } else {
       return {
         message: () => `expected ${received} to be a valid coverage diff`,
-        pass: false,
+        pass: false
       }
     }
-  },
+  }
 })
 
 declare global {

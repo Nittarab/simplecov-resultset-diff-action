@@ -36,7 +36,7 @@ export function createMockOctokit(): {
 } {
   const mockCreateComment = jest.fn()
   const mockGitHub = jest.mocked(github)
-  
+
   const mockGetOctokit = mockGitHub.getOctokit.mockReturnValue({
     rest: {
       issues: {
@@ -51,10 +51,15 @@ export function createMockOctokit(): {
 /**
  * Helper to create mock SimpleCov resultset
  */
-export function createMockResultset(files: Record<string, {
-  lines: (number | null)[]
-  branches?: Record<string, Record<string, number>>
-}>): any {
+export function createMockResultset(
+  files: Record<
+    string,
+    {
+      lines: (number | null)[]
+      branches?: Record<string, Record<string, number>>
+    }
+  >
+): any {
   return {
     'test-command': {
       coverage: Object.fromEntries(
@@ -84,7 +89,7 @@ export function cleanupEnvironment(): void {
 export function setupTestEnvironment(): void {
   jest.clearAllMocks()
   cleanupEnvironment()
-  
+
   // Set test environment
   process.env.NODE_ENV = 'test'
 }
