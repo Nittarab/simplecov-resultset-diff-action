@@ -175,7 +175,16 @@ build-base:
 
 ## Development
 
-### Running Tests
+### Test Suite
+
+The project features a comprehensive test suite with 45+ tests organized across multiple focused files:
+
+- **Unit Tests**: Core functionality testing for SimpleCov engine and utilities
+- **Integration Tests**: Full `run()` function testing with mocked GitHub APIs
+- **Property-Based Tests**: Mathematical precision and edge case validation
+- **Performance Tests**: Large dataset handling and stress testing
+
+#### Running Tests
 
 To run the unit tests:
 
@@ -188,6 +197,8 @@ To run tests with coverage:
 ```bash
 npm run coverage
 ```
+
+The test suite maintains high coverage thresholds (95%+ functions/lines/statements, 90%+ branches).
 
 ### Building the Action
 
