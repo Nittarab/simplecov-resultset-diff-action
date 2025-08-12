@@ -216,34 +216,6 @@ For development with auto-rebuilding:
 npm run package:watch
 ```
 
-### CI/CD
-
-The project uses an improved CI pipeline that:
-
-- **Tests across multiple Node.js versions** (18, 20, 22) and operating systems
-- **Separates concerns** with dedicated jobs for testing, building, and integration testing
-- **Avoids posting confusing comments** during CI by using dry-run mode for integration tests
-- **Validates the build** is up-to-date and properly formatted
-- **Generates coverage reports** and badges automatically
-
-### Dry-Run Mode
-
-The action supports dry-run mode when no token is provided, which is useful for:
-
-- Testing the action logic without posting comments
-- CI/CD validation without side effects
-- Local development and debugging
-
-Example dry-run usage:
-
-```yml
-- uses: ./
-  with:
-    base-resultset-path: ./fixtures/base.json
-    head-resultset-path: ./fixtures/head.json
-    # No token provided = dry-run mode
-```
-
 ## License
 
 MIT
