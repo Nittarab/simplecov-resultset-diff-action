@@ -175,7 +175,16 @@ build-base:
 
 ## Development
 
-### Running Tests
+### Test Suite
+
+The project features a comprehensive test suite with 45+ tests organized across multiple focused files:
+
+- **Unit Tests**: Core functionality testing for SimpleCov engine and utilities
+- **Integration Tests**: Full `run()` function testing with mocked GitHub APIs
+- **Property-Based Tests**: Mathematical precision and edge case validation
+- **Performance Tests**: Large dataset handling and stress testing
+
+#### Running Tests
 
 To run the unit tests:
 
@@ -188,6 +197,8 @@ To run tests with coverage:
 ```bash
 npm run coverage
 ```
+
+The test suite maintains high coverage thresholds (95%+ functions/lines/statements, 90%+ branches).
 
 ### Building the Action
 
@@ -203,34 +214,6 @@ For development with auto-rebuilding:
 
 ```bash
 npm run package:watch
-```
-
-### CI/CD
-
-The project uses an improved CI pipeline that:
-
-- **Tests across multiple Node.js versions** (18, 20, 22) and operating systems
-- **Separates concerns** with dedicated jobs for testing, building, and integration testing
-- **Avoids posting confusing comments** during CI by using dry-run mode for integration tests
-- **Validates the build** is up-to-date and properly formatted
-- **Generates coverage reports** and badges automatically
-
-### Dry-Run Mode
-
-The action supports dry-run mode when no token is provided, which is useful for:
-
-- Testing the action logic without posting comments
-- CI/CD validation without side effects
-- Local development and debugging
-
-Example dry-run usage:
-
-```yml
-- uses: ./
-  with:
-    base-resultset-path: ./fixtures/base.json
-    head-resultset-path: ./fixtures/head.json
-    # No token provided = dry-run mode
 ```
 
 ## License
