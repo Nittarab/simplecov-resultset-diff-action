@@ -2,8 +2,18 @@ import path from 'path'
 import * as github from '@actions/github'
 import * as core from '@actions/core'
 import {getMarkdownTable} from 'markdown-table-ts'
-import {Coverage, getCoverageDiff, FileCoverageDiff} from './simplecov'
-import {doesPathExists, formatDiff, parseResultset} from './utils'
+import {
+  Coverage,
+  getCoverageDiff,
+  FileCoverageDiff,
+  getTotalCoverageDiff
+} from './simplecov'
+import {
+  doesPathExists,
+  formatDiff,
+  parseResultset,
+  formatTotalCoverageDiff
+} from './utils'
 
 const WORKSPACE =
   process.env.NODE_ENV === 'test' ? '/' : process.env.GITHUB_WORKSPACE!
@@ -22,12 +32,47 @@ export function calculateCoverageDiff(paths: {
   const coverageHead = new Coverage(head_content)
 
   const diff = getCoverageDiff(coverageBase, coverageHead)
+  const totalDiff = getTotalCoverageDiff(coverageBase, coverageHead)
 
-  let content: string
+  let content = ''
+
+  // Add total coverage summary
+  const hasTotalChanges =
+    totalDiff.lines.diff !== 0 || totalDiff.branches.diff !== 0
+  if (hasTotalChanges) {
+    const [
+      linesLabel,
+      linesBase,
+      linesHead,
+      linesDiff,
+      branchesLabel,
+      branchesBase,
+      branchesHead,
+      branchesDiff
+    ] = formatTotalCoverageDiff(totalDiff)
+
+    const totalCoverageTable = getMarkdownTable({
+      table: {
+        head: ['Metric', 'Base', 'Head', 'Change'],
+        body: [
+          [linesLabel, linesBase, linesHead, linesDiff],
+          [branchesLabel, branchesBase, branchesHead, branchesDiff]
+        ]
+      }
+    })
+
+    content += `## Coverage Summary\n${totalCoverageTable}\n\n`
+  }
+
+  // Add file-by-file differences
   if (diff.length === 0) {
-    content = 'No differences'
+    if (!hasTotalChanges) {
+      content += 'No differences'
+    } else {
+      content += '## File Coverage\nNo file-level coverage changes'
+    }
   } else {
-    content = getMarkdownTable({
+    const fileCoverageTable = getMarkdownTable({
       table: {
         head: [
           'Filename',
@@ -39,6 +84,9 @@ export function calculateCoverageDiff(paths: {
         body: diff.map((d: FileCoverageDiff) => formatDiff(d, WORKSPACE))
       }
     })
+
+    const sectionTitle = hasTotalChanges ? '## File Coverage\n' : ''
+    content += `${sectionTitle}${fileCoverageTable}`
   }
 
   return `## Coverage difference

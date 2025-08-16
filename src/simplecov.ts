@@ -22,31 +22,84 @@ export interface FileCoverage {
   branches: number
 }
 
+export interface CoverageStats {
+  covered: number
+  total: number
+  percentage: number
+}
+
+export interface TotalCoverageStats {
+  lines: CoverageStats
+  branches: CoverageStats
+}
+
+export interface TotalCoverageDiff {
+  lines: {
+    base: CoverageStats
+    head: CoverageStats
+    diff: number
+  }
+  branches: {
+    base: CoverageStats
+    head: CoverageStats
+    diff: number
+  }
+}
+
+export interface TotalCoverage {
+  lines: {
+    covered: number
+    total: number
+    percentage: number
+  }
+  branches: {
+    covered: number
+    total: number
+    percentage: number
+  }
+}
+
 function floor(n: number, digits = 0): number {
   const d = Math.pow(10, digits)
   const x = Math.floor(n * d)
   return x / d
 }
 
-function linesCoverage(coverage: LineCoverage): number {
+function linesStats(coverage: LineCoverage): {
+  covered: number
+  total: number
+  percentage: number
+} {
   const effectiveLines = coverage.filter(hit => hit !== null) as number[]
-  const rows = effectiveLines.length
-  if (rows === 0) {
-    return 100
+  const total = effectiveLines.length
+  if (total === 0) {
+    return {covered: 0, total: 0, percentage: 100}
   }
 
   const covered = effectiveLines.filter(hit => hit > 0).length
-  return floor((covered / rows) * 100, 2)
+  return {
+    covered,
+    total,
+    percentage: floor((covered / total) * 100, 2)
+  }
 }
 
-function branchesCoverages(coverage: BranchCoverage | undefined): number {
+function linesCoverage(coverage: LineCoverage): number {
+  return linesStats(coverage).percentage
+}
+
+function branchesStats(coverage: BranchCoverage | undefined): {
+  covered: number
+  total: number
+  percentage: number
+} {
   if (!coverage) {
-    return 100
+    return {covered: 0, total: 0, percentage: 100}
   }
 
   const conditions = Object.keys(coverage)
   if (conditions.length === 0) {
-    return 100
+    return {covered: 0, total: 0, percentage: 100}
   }
 
   let total = 0
@@ -61,18 +114,30 @@ function branchesCoverages(coverage: BranchCoverage | undefined): number {
       }
     }
   }
-  return floor((covered / total) * 100, 2)
+  return {
+    covered,
+    total,
+    percentage: floor((covered / total) * 100, 2)
+  }
+}
+
+function branchesCoverages(coverage: BranchCoverage | undefined): number {
+  return branchesStats(coverage).percentage
 }
 
 export class Coverage {
   files: FileCoverage[]
+  private rawCoverages: RawCoverages
 
   constructor(resultset: ResultSet) {
     this.files = []
+    this.rawCoverages = {}
+
     for (const coverages of Object.values(resultset)) {
       for (const [filename, coverage] of Object.entries(
         coverages['coverage']
       )) {
+        this.rawCoverages[filename] = coverage
         this.files.push({
           filename,
           lines: linesCoverage(coverage.lines),
@@ -88,6 +153,51 @@ export class Coverage {
       map.set(fileCov.filename, fileCov)
     }
     return map
+  }
+
+  getTotalLinesCoverage(): TotalCoverage['lines'] {
+    let totalCovered = 0
+    let totalLines = 0
+
+    for (const coverage of Object.values(this.rawCoverages)) {
+      const stats = linesStats(coverage.lines)
+      totalCovered += stats.covered
+      totalLines += stats.total
+    }
+
+    const percentage =
+      totalLines === 0 ? 100 : floor((totalCovered / totalLines) * 100, 2)
+    return {
+      covered: totalCovered,
+      total: totalLines,
+      percentage
+    }
+  }
+
+  getTotalBranchesCoverage(): TotalCoverage['branches'] {
+    let totalCovered = 0
+    let totalBranches = 0
+
+    for (const coverage of Object.values(this.rawCoverages)) {
+      const stats = branchesStats(coverage.branches ?? {})
+      totalCovered += stats.covered
+      totalBranches += stats.total
+    }
+
+    const percentage =
+      totalBranches === 0 ? 100 : floor((totalCovered / totalBranches) * 100, 2)
+    return {
+      covered: totalCovered,
+      total: totalBranches,
+      percentage
+    }
+  }
+
+  getTotalCoverage(): TotalCoverage {
+    return {
+      lines: this.getTotalLinesCoverage(),
+      branches: this.getTotalBranchesCoverage()
+    }
   }
 }
 
@@ -106,6 +216,30 @@ export function getCoverageDiff(
     }
   }
   return diff
+}
+
+export function getTotalCoverageDiff(
+  base: Coverage,
+  head: Coverage
+): TotalCoverageDiff {
+  const baseTotals = base.getTotalCoverage()
+  const headTotals = head.getTotalCoverage()
+
+  return {
+    lines: {
+      base: baseTotals.lines,
+      head: headTotals.lines,
+      diff: floor(headTotals.lines.percentage - baseTotals.lines.percentage, 2)
+    },
+    branches: {
+      base: baseTotals.branches,
+      head: headTotals.branches,
+      diff: floor(
+        headTotals.branches.percentage - baseTotals.branches.percentage,
+        2
+      )
+    }
+  }
 }
 
 function mergeFilenames(cov1: Coverage, cov2: Coverage): string[] {
