@@ -1,4 +1,9 @@
-import {Coverage, getCoverageDiff, FileCoverage} from '../src/simplecov'
+import {
+  Coverage,
+  getCoverageDiff,
+  FileCoverage,
+  getTotalCoverageDiff
+} from '../src/simplecov'
 
 describe('SimpleCov Coverage Engine', () => {
   describe('Coverage class', () => {
@@ -209,6 +214,224 @@ describe('SimpleCov Coverage Engine', () => {
       expect(diff[0].filename).toBe('/test/deleted.rb')
       expect(diff[0].lines.from).toBe(100)
       expect(diff[0].lines.to).toBeNull()
+    })
+  })
+
+  describe('Total coverage functionality', () => {
+    test('getTotalLinesCoverage calculates correct totals', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 1, 0, null, 1], // 3/4 = 75%
+              branches: {}
+            },
+            '/test/file2.rb': {
+              lines: [1, 0, 1], // 2/3 = 66.67%
+              branches: {}
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const totalLines = coverage.getTotalLinesCoverage()
+
+      expect(totalLines.covered).toBe(5) // 3 + 2
+      expect(totalLines.total).toBe(7) // 4 + 3
+      expect(totalLines.percentage).toBe(71.42) // 5/7 = 71.42% (floored to 2 decimal places)
+    })
+
+    test('getTotalBranchesCoverage calculates correct totals', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1],
+              branches: {
+                condition1: {
+                  branch1: 1,
+                  branch2: 0
+                }
+              }
+            },
+            '/test/file2.rb': {
+              lines: [1],
+              branches: {
+                condition2: {
+                  branch3: 1,
+                  branch4: 1,
+                  branch5: 0
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const totalBranches = coverage.getTotalBranchesCoverage()
+
+      expect(totalBranches.covered).toBe(3) // 1 + 2
+      expect(totalBranches.total).toBe(5) // 2 + 3
+      expect(totalBranches.percentage).toBe(60) // 3/5 = 60%
+    })
+
+    test('getTotalCoverage returns both lines and branches', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 1, 0], // 2/3 = 66.67%
+              branches: {
+                condition1: {
+                  branch1: 1,
+                  branch2: 0
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const total = coverage.getTotalCoverage()
+
+      expect(total.lines.covered).toBe(2)
+      expect(total.lines.total).toBe(3)
+      expect(total.lines.percentage).toBe(66.66) // floored to 2 decimal places
+
+      expect(total.branches.covered).toBe(1)
+      expect(total.branches.total).toBe(2)
+      expect(total.branches.percentage).toBe(50)
+    })
+
+    test('getTotalCoverageDiff calculates differences correctly', () => {
+      const baseResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 0, 1], // 2/3 = 66.67%
+              branches: {
+                condition1: {
+                  branch1: 1,
+                  branch2: 0
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const headResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 1, 1], // 3/3 = 100%
+              branches: {
+                condition1: {
+                  branch1: 1,
+                  branch2: 1
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const baseCoverage = new Coverage(baseResultset)
+      const headCoverage = new Coverage(headResultset)
+
+      const diff = getTotalCoverageDiff(baseCoverage, headCoverage)
+
+      expect(diff.lines.base.covered).toBe(2)
+      expect(diff.lines.base.total).toBe(3)
+      expect(diff.lines.base.percentage).toBe(66.66) // floored to 2 decimal places
+
+      expect(diff.lines.head.covered).toBe(3)
+      expect(diff.lines.head.total).toBe(3)
+      expect(diff.lines.head.percentage).toBe(100)
+
+      expect(diff.lines.diff).toBe(33.34) // 100 - 66.66 = 33.34
+
+      expect(diff.branches.base.covered).toBe(1)
+      expect(diff.branches.base.total).toBe(2)
+      expect(diff.branches.base.percentage).toBe(50)
+
+      expect(diff.branches.head.covered).toBe(2)
+      expect(diff.branches.head.total).toBe(2)
+      expect(diff.branches.head.percentage).toBe(100)
+
+      expect(diff.branches.diff).toBe(50) // 100 - 50
+    })
+
+    test('getTotalCoverageDiff handles no changes', () => {
+      const resultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 1, 0],
+              branches: {
+                condition1: {
+                  branch1: 1,
+                  branch2: 0
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const baseCoverage = new Coverage(resultset)
+      const headCoverage = new Coverage(resultset)
+
+      const diff = getTotalCoverageDiff(baseCoverage, headCoverage)
+
+      expect(diff.lines.diff).toBe(0)
+      expect(diff.branches.diff).toBe(0)
+    })
+
+    test('getTotalCoverageDiff handles new files in head', () => {
+      const baseResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 0], // 1/2 = 50%
+              branches: {}
+            }
+          }
+        }
+      }
+
+      const headResultset = {
+        'test-command': {
+          coverage: {
+            '/test/file1.rb': {
+              lines: [1, 0], // 1/2 = 50%
+              branches: {}
+            },
+            '/test/file2.rb': {
+              lines: [1, 1], // 2/2 = 100%
+              branches: {}
+            }
+          }
+        }
+      }
+
+      const baseCoverage = new Coverage(baseResultset)
+      const headCoverage = new Coverage(headResultset)
+
+      const diff = getTotalCoverageDiff(baseCoverage, headCoverage)
+
+      expect(diff.lines.base.covered).toBe(1)
+      expect(diff.lines.base.total).toBe(2)
+      expect(diff.lines.base.percentage).toBe(50)
+
+      expect(diff.lines.head.covered).toBe(3) // 1 + 2
+      expect(diff.lines.head.total).toBe(4) // 2 + 2
+      expect(diff.lines.head.percentage).toBe(75) // 3/4
+
+      expect(diff.lines.diff).toBe(25) // 75 - 50
     })
   })
 })

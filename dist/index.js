@@ -30139,12 +30139,34 @@ function calculateCoverageDiff(paths) {
     const coverageBase = new simplecov_1.Coverage(base_content);
     const coverageHead = new simplecov_1.Coverage(head_content);
     const diff = (0, simplecov_1.getCoverageDiff)(coverageBase, coverageHead);
-    let content;
+    const totalDiff = (0, simplecov_1.getTotalCoverageDiff)(coverageBase, coverageHead);
+    let content = '';
+    // Add total coverage summary
+    const hasTotalChanges = totalDiff.lines.diff !== 0 || totalDiff.branches.diff !== 0;
+    if (hasTotalChanges) {
+        const [linesLabel, linesBase, linesHead, linesDiff, branchesLabel, branchesBase, branchesHead, branchesDiff] = (0, utils_1.formatTotalCoverageDiff)(totalDiff);
+        const totalCoverageTable = (0, markdown_table_ts_1.getMarkdownTable)({
+            table: {
+                head: ['Metric', 'Base', 'Head', 'Change'],
+                body: [
+                    [linesLabel, linesBase, linesHead, linesDiff],
+                    [branchesLabel, branchesBase, branchesHead, branchesDiff]
+                ]
+            }
+        });
+        content += `## Coverage Summary\n${totalCoverageTable}\n\n`;
+    }
+    // Add file-by-file differences
     if (diff.length === 0) {
-        content = 'No differences';
+        if (!hasTotalChanges) {
+            content += 'No differences';
+        }
+        else {
+            content += '## File Coverage\nNo file-level coverage changes';
+        }
     }
     else {
-        content = (0, markdown_table_ts_1.getMarkdownTable)({
+        const fileCoverageTable = (0, markdown_table_ts_1.getMarkdownTable)({
             table: {
                 head: [
                     'Filename',
@@ -30156,6 +30178,8 @@ function calculateCoverageDiff(paths) {
                 body: diff.map((d) => (0, utils_1.formatDiff)(d, WORKSPACE))
             }
         });
+        const sectionTitle = hasTotalChanges ? '## File Coverage\n' : '';
+        content += `${sectionTitle}${fileCoverageTable}`;
     }
     return `## Coverage difference
 ${content}
@@ -30220,27 +30244,35 @@ async function run() {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Coverage = void 0;
 exports.getCoverageDiff = getCoverageDiff;
+exports.getTotalCoverageDiff = getTotalCoverageDiff;
 function floor(n, digits = 0) {
     const d = Math.pow(10, digits);
     const x = Math.floor(n * d);
     return x / d;
 }
-function linesCoverage(coverage) {
+function linesStats(coverage) {
     const effectiveLines = coverage.filter(hit => hit !== null);
-    const rows = effectiveLines.length;
-    if (rows === 0) {
-        return 100;
+    const total = effectiveLines.length;
+    if (total === 0) {
+        return { covered: 0, total: 0, percentage: 100 };
     }
     const covered = effectiveLines.filter(hit => hit > 0).length;
-    return floor((covered / rows) * 100, 2);
+    return {
+        covered,
+        total,
+        percentage: floor((covered / total) * 100, 2)
+    };
 }
-function branchesCoverages(coverage) {
+function linesCoverage(coverage) {
+    return linesStats(coverage).percentage;
+}
+function branchesStats(coverage) {
     if (!coverage) {
-        return 100;
+        return { covered: 0, total: 0, percentage: 100 };
     }
     const conditions = Object.keys(coverage);
     if (conditions.length === 0) {
-        return 100;
+        return { covered: 0, total: 0, percentage: 100 };
     }
     let total = 0;
     let covered = 0;
@@ -30254,14 +30286,24 @@ function branchesCoverages(coverage) {
             }
         }
     }
-    return floor((covered / total) * 100, 2);
+    return {
+        covered,
+        total,
+        percentage: floor((covered / total) * 100, 2)
+    };
+}
+function branchesCoverages(coverage) {
+    return branchesStats(coverage).percentage;
 }
 class Coverage {
     files;
+    rawCoverages;
     constructor(resultset) {
         this.files = [];
+        this.rawCoverages = {};
         for (const coverages of Object.values(resultset)) {
             for (const [filename, coverage] of Object.entries(coverages['coverage'])) {
+                this.rawCoverages[filename] = coverage;
                 this.files.push({
                     filename,
                     lines: linesCoverage(coverage.lines),
@@ -30277,6 +30319,42 @@ class Coverage {
         }
         return map;
     }
+    getTotalLinesCoverage() {
+        let totalCovered = 0;
+        let totalLines = 0;
+        for (const coverage of Object.values(this.rawCoverages)) {
+            const stats = linesStats(coverage.lines);
+            totalCovered += stats.covered;
+            totalLines += stats.total;
+        }
+        const percentage = totalLines === 0 ? 100 : floor((totalCovered / totalLines) * 100, 2);
+        return {
+            covered: totalCovered,
+            total: totalLines,
+            percentage
+        };
+    }
+    getTotalBranchesCoverage() {
+        let totalCovered = 0;
+        let totalBranches = 0;
+        for (const coverage of Object.values(this.rawCoverages)) {
+            const stats = branchesStats(coverage.branches ?? {});
+            totalCovered += stats.covered;
+            totalBranches += stats.total;
+        }
+        const percentage = totalBranches === 0 ? 100 : floor((totalCovered / totalBranches) * 100, 2);
+        return {
+            covered: totalCovered,
+            total: totalBranches,
+            percentage
+        };
+    }
+    getTotalCoverage() {
+        return {
+            lines: this.getTotalLinesCoverage(),
+            branches: this.getTotalBranchesCoverage()
+        };
+    }
 }
 exports.Coverage = Coverage;
 function getCoverageDiff(cov1, cov2) {
@@ -30291,6 +30369,22 @@ function getCoverageDiff(cov1, cov2) {
         }
     }
     return diff;
+}
+function getTotalCoverageDiff(base, head) {
+    const baseTotals = base.getTotalCoverage();
+    const headTotals = head.getTotalCoverage();
+    return {
+        lines: {
+            base: baseTotals.lines,
+            head: headTotals.lines,
+            diff: floor(headTotals.lines.percentage - baseTotals.lines.percentage, 2)
+        },
+        branches: {
+            base: baseTotals.branches,
+            head: headTotals.branches,
+            diff: floor(headTotals.branches.percentage - baseTotals.branches.percentage, 2)
+        }
+    };
 }
 function mergeFilenames(cov1, cov2) {
     const files1 = cov1.files.map(f => f.filename);
@@ -30356,6 +30450,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.doesPathExists = doesPathExists;
 exports.parseResultset = parseResultset;
 exports.formatDiff = formatDiff;
+exports.formatTotalCoverageDiff = formatTotalCoverageDiff;
 const fs_1 = __importDefault(__nccwpck_require__(9896));
 const path_1 = __importDefault(__nccwpck_require__(6928));
 function doesPathExists(filepath) {
@@ -30422,6 +30517,36 @@ function formatDiff(diff, workspace) {
         formatCoverageValue(diff.branches),
         formatCoverageDiff(diff.lines),
         formatCoverageDiff(diff.branches)
+    ];
+}
+function formatCoverageStatsValue(stats) {
+    return `${stats.covered}/${stats.total} (${formatPercentage(stats.percentage)})`;
+}
+function formatCoverageStatsDiff(baseStats, headStats, diff) {
+    const coveredDiff = headStats.covered - baseStats.covered;
+    const totalDiff = headStats.total - baseStats.total;
+    let result = '';
+    // Show change in covered/total if there's a difference
+    if (coveredDiff !== 0 || totalDiff !== 0) {
+        const coveredSign = coveredDiff > 0 ? '+' : '';
+        const totalSign = totalDiff > 0 ? '+' : totalDiff === 0 ? '' : '';
+        const totalDiffStr = totalDiff === 0 ? '0' : `${totalSign}${totalDiff}`;
+        result = `${coveredSign}${coveredDiff}/${totalDiffStr} `;
+    }
+    // Add percentage diff
+    result += formatPercentageDiff(diff);
+    return result;
+}
+function formatTotalCoverageDiff(totalDiff) {
+    return [
+        'Lines',
+        formatCoverageStatsValue(totalDiff.lines.base),
+        formatCoverageStatsValue(totalDiff.lines.head),
+        formatCoverageStatsDiff(totalDiff.lines.base, totalDiff.lines.head, totalDiff.lines.diff),
+        'Branches',
+        formatCoverageStatsValue(totalDiff.branches.base),
+        formatCoverageStatsValue(totalDiff.branches.head),
+        formatCoverageStatsDiff(totalDiff.branches.base, totalDiff.branches.head, totalDiff.branches.diff)
     ];
 }
 
