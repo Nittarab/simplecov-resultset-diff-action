@@ -111,7 +111,7 @@ function formatCoverageStatsDiff(
   // Show change in covered/total if there's a difference
   if (coveredDiff !== 0 || totalDiff !== 0) {
     const coveredSign = coveredDiff > 0 ? '+' : ''
-    const totalSign = totalDiff > 0 ? '+' : totalDiff === 0 ? '' : ''
+    const totalSign = totalDiff > 0 ? '+' : ''
     const totalDiffStr = totalDiff === 0 ? '0' : `${totalSign}${totalDiff}`
     result = `${coveredSign}${coveredDiff}/${totalDiffStr} `
   }
