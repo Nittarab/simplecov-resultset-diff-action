@@ -1,4 +1,4 @@
-import {formatDiff} from '../src/utils'
+import {formatDiff, formatTotalCoverageDiff} from '../src/utils'
 
 describe('Utils - Formatting Functions', () => {
   describe('formatDiff', () => {
@@ -94,6 +94,116 @@ describe('Utils - Formatting Functions', () => {
         '0.1%',
         '📈 +100%',
         '📉 -99.8%'
+      ])
+    })
+  })
+
+  describe('formatTotalCoverageDiff', () => {
+    test('formats total coverage with increases', () => {
+      const mockTotalDiff = {
+        lines: {
+          base: {covered: 80, total: 100, percentage: 80},
+          head: {covered: 90, total: 100, percentage: 90},
+          diff: 10
+        },
+        branches: {
+          base: {covered: 40, total: 50, percentage: 80},
+          head: {covered: 45, total: 50, percentage: 90},
+          diff: 10
+        }
+      }
+
+      const result = formatTotalCoverageDiff(mockTotalDiff)
+      expect(result).toEqual([
+        'Lines',
+        '80/100 (80%)',
+        '90/100 (90%)',
+        '+10/0 📈 +10%',
+        'Branches',
+        '40/50 (80%)',
+        '45/50 (90%)',
+        '+5/0 📈 +10%'
+      ])
+    })
+
+    test('formats total coverage with decreases', () => {
+      const mockTotalDiff = {
+        lines: {
+          base: {covered: 90, total: 100, percentage: 90},
+          head: {covered: 80, total: 100, percentage: 80},
+          diff: -10
+        },
+        branches: {
+          base: {covered: 45, total: 50, percentage: 90},
+          head: {covered: 40, total: 50, percentage: 80},
+          diff: -10
+        }
+      }
+
+      const result = formatTotalCoverageDiff(mockTotalDiff)
+      expect(result).toEqual([
+        'Lines',
+        '90/100 (90%)',
+        '80/100 (80%)',
+        '-10/0 📉 -10%',
+        'Branches',
+        '45/50 (90%)',
+        '40/50 (80%)',
+        '-5/0 📉 -10%'
+      ])
+    })
+
+    test('formats total coverage with no changes', () => {
+      const mockTotalDiff = {
+        lines: {
+          base: {covered: 80, total: 100, percentage: 80},
+          head: {covered: 80, total: 100, percentage: 80},
+          diff: 0
+        },
+        branches: {
+          base: {covered: 40, total: 50, percentage: 80},
+          head: {covered: 40, total: 50, percentage: 80},
+          diff: 0
+        }
+      }
+
+      const result = formatTotalCoverageDiff(mockTotalDiff)
+      expect(result).toEqual([
+        'Lines',
+        '80/100 (80%)',
+        '80/100 (80%)',
+        '➡️ 0%',
+        'Branches',
+        '40/50 (80%)',
+        '40/50 (80%)',
+        '➡️ 0%'
+      ])
+    })
+
+    test('formats total coverage with added lines/branches', () => {
+      const mockTotalDiff = {
+        lines: {
+          base: {covered: 80, total: 100, percentage: 80},
+          head: {covered: 90, total: 110, percentage: 81.82},
+          diff: 1.82
+        },
+        branches: {
+          base: {covered: 40, total: 50, percentage: 80},
+          head: {covered: 45, total: 60, percentage: 75},
+          diff: -5
+        }
+      }
+
+      const result = formatTotalCoverageDiff(mockTotalDiff)
+      expect(result).toEqual([
+        'Lines',
+        '80/100 (80%)',
+        '90/110 (81.8%)',
+        '+10/+10 📈 +1.8%',
+        'Branches',
+        '40/50 (80%)',
+        '45/60 (75%)',
+        '+5/+10 📉 -5%'
       ])
     })
   })

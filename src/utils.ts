@@ -1,5 +1,10 @@
 import fs from 'fs'
-import {FileCoverageDiff, ResultSet} from './simplecov'
+import {
+  FileCoverageDiff,
+  ResultSet,
+  TotalCoverageDiff,
+  CoverageStats
+} from './simplecov'
 import path from 'path'
 
 export function doesPathExists(filepath: string): void {
@@ -86,5 +91,56 @@ export function formatDiff(
     formatCoverageValue(diff.branches),
     formatCoverageDiff(diff.lines),
     formatCoverageDiff(diff.branches)
+  ]
+}
+
+function formatCoverageStatsValue(stats: CoverageStats): string {
+  return `${stats.covered}/${stats.total} (${formatPercentage(stats.percentage)})`
+}
+
+function formatCoverageStatsDiff(
+  baseStats: CoverageStats,
+  headStats: CoverageStats,
+  diff: number
+): string {
+  const coveredDiff = headStats.covered - baseStats.covered
+  const totalDiff = headStats.total - baseStats.total
+
+  let result = ''
+
+  // Show change in covered/total if there's a difference
+  if (coveredDiff !== 0 || totalDiff !== 0) {
+    const coveredSign = coveredDiff > 0 ? '+' : ''
+    const totalSign = totalDiff > 0 ? '+' : ''
+    const totalDiffStr = totalDiff === 0 ? '0' : `${totalSign}${totalDiff}`
+    result = `${coveredSign}${coveredDiff}/${totalDiffStr} `
+  }
+
+  // Add percentage diff
+  result += formatPercentageDiff(diff)
+
+  return result
+}
+
+export function formatTotalCoverageDiff(
+  totalDiff: TotalCoverageDiff
+): string[] {
+  return [
+    'Lines',
+    formatCoverageStatsValue(totalDiff.lines.base),
+    formatCoverageStatsValue(totalDiff.lines.head),
+    formatCoverageStatsDiff(
+      totalDiff.lines.base,
+      totalDiff.lines.head,
+      totalDiff.lines.diff
+    ),
+    'Branches',
+    formatCoverageStatsValue(totalDiff.branches.base),
+    formatCoverageStatsValue(totalDiff.branches.head),
+    formatCoverageStatsDiff(
+      totalDiff.branches.base,
+      totalDiff.branches.head,
+      totalDiff.branches.diff
+    )
   ]
 }
