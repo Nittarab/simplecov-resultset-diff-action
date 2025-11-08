@@ -1,0 +1,9 @@
+{
+  "Minitest": {
+    "coverage": {
+      "/project/file1.rb": {"lines": [1,1], "branches": {}},
+      "/project/file2.rb": {"lines": [0,0], "branches": {}}
+    },
+    "timestamp": 1700000201
+  }
+}

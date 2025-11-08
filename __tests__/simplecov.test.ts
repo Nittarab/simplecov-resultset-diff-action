@@ -433,6 +433,23 @@ describe('SimpleCov Coverage Engine', () => {
 
       expect(diff.lines.diff).toBe(25) // 75 - 50
     })
+
+    test('aggregated total coverage with all files having zero executable lines returns 100%', () => {
+      const mockResultset = {
+        'test-command': {
+          coverage: {
+            '/test/empty1.rb': {lines: [null, null], branches: {}},
+            '/test/empty2.rb': {lines: [null], branches: {}}
+          }
+        }
+      }
+
+      const coverage = new Coverage(mockResultset)
+      const totals = coverage.getTotalLinesCoverage()
+      expect(totals.covered).toBe(0)
+      expect(totals.total).toBe(0)
+      expect(totals.percentage).toBe(100)
+    })
   })
 
   describe('Branch pattern coverage scenarios', () => {
@@ -510,7 +527,7 @@ describe('SimpleCov Coverage Engine', () => {
       expect(ternary?.branches).toBe(100) // 2/2 branches covered
     })
 
-    test('detects branch coverage crossing 50% threshold', () => {
+    test('branch hit count changes without percentage change (still 100%)', () => {
       const baseResultset = {
         'RSpec': {
           coverage: {
@@ -600,6 +617,45 @@ describe('SimpleCov Coverage Engine', () => {
       // Branch coverage stays at 50%
       expect(baseFile.branches).toBe(50)
       expect(headFile.branches).toBe(50)
+    })
+
+    test('detects branch-only percentage improvements when line coverage unchanged', () => {
+      const baseResultset = {
+        RSpec: {
+          coverage: {
+            '/project/branch_only.rb': {
+              lines: [1, 1, 1, 1], // 100%
+              branches: {
+                cond1: {branch1: 1, branch2: 0} // 1/2 = 50%
+              }
+            }
+          }
+        }
+      }
+
+      const headResultset = {
+        RSpec: {
+          coverage: {
+            '/project/branch_only.rb': {
+              lines: [1, 1, 1, 1], // unchanged 100%
+              branches: {
+                cond1: {branch1: 1, branch2: 1} // 2/2 = 100%
+              }
+            }
+          }
+        }
+      }
+
+      const baseCoverage = new Coverage(baseResultset)
+      const headCoverage = new Coverage(headResultset)
+
+      const diff = getCoverageDiff(baseCoverage, headCoverage)
+      expect(diff).toHaveLength(1)
+      const fileDiff = diff[0]
+      expect(fileDiff.lines.from).toBe(100)
+      expect(fileDiff.lines.to).toBe(100)
+      expect(fileDiff.branches.from).toBe(50)
+      expect(fileDiff.branches.to).toBe(100)
     })
   })
 })

@@ -46,7 +46,7 @@ describe('GitHub Action Configuration', () => {
 })
 
 describe('Output formatting scenarios', () => {
-  it('should show Coverage Summary without File Coverage when no files exceed thresholds', () => {
+  it('shows summary and file coverage when totals change and new file added', () => {
     const basePath = path.resolve(__dirname, './fixtures/totals_only_base.json')
     const headPath = path.resolve(__dirname, './fixtures/totals_only_head.json')
 
@@ -57,9 +57,9 @@ describe('Output formatting scenarios', () => {
     expect(diff).toMatch(/Lines\s+\|/)
     expect(diff).toMatch(/Branches\s+\|/)
 
-    // Should have File Coverage section now - because adding a new file counts as a diff
+    // Should have File Coverage section - because adding a new file counts as a diff
     expect(diff).toContain('File Coverage')
-    
+
     // Should include the new file
     expect(diff).toContain('small_change6.rb')
 
@@ -82,6 +82,19 @@ describe('Output formatting scenarios', () => {
 
     // Head has 6 files (added one new file)
     expect(headCoverage.files.length).toBe(6)
+
+    // Verify total coverage math
+    // Base: covered lines = 9+8+7+6+5 = 35; total lines = 5*10 = 50 -> 70%
+    const baseTotals = baseCoverage.getTotalLinesCoverage()
+    expect(baseTotals.covered).toBe(35)
+    expect(baseTotals.total).toBe(50)
+    expect(baseTotals.percentage).toBe(70)
+
+    // Head: covered lines = 10+9+8+7+6+6 = 46; total lines = 6*10 = 60 -> 76.66% floored
+    const headTotals = headCoverage.getTotalLinesCoverage()
+    expect(headTotals.covered).toBe(46)
+    expect(headTotals.total).toBe(60)
+    expect(headTotals.percentage).toBe(76.66)
 
     // Verify small changes in individual base files (each is 0-10% change except one new file)
     expect(baseCoverage.files[0].lines).toBe(90) // small_change1.rb
