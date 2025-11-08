@@ -1,0 +1,63 @@
+{
+  "RSpec": {
+    "coverage": {
+      "/project/conditional_logic.rb": {
+        "lines": [null, null, 1, null, 1, 10, null, 8, null, 2, null, null, null],
+        "branches": {
+          "[:if, 0, 6, 4, 10, 7]": {
+            "[:then, 1, 7, 6, 7, 18]": 8,
+            "[:else, 2, 9, 6, 9, 18]": 2
+          }
+        }
+      },
+      "/project/case_statement.rb": {
+        "lines": [null, null, 1, null, 1, 15, null, 5, null, 5, null, 5, null, 0, null, null, null],
+        "branches": {
+          "[:case, 0, 6, 4, 15, 7]": {
+            "[:when, 1, 7, 6, 7, 16]": 5,
+            "[:when, 2, 9, 6, 9, 16]": 5,
+            "[:when, 3, 11, 6, 11, 19]": 5,
+            "[:else, 4, 13, 6, 13, 16]": 0
+          }
+        }
+      },
+      "/project/unless_guard.rb": {
+        "lines": [null, null, 1, null, 1, 8, null, 2, null, null],
+        "branches": {
+          "[:unless, 0, 6, 4, 6, 35]": {
+            "[:else, 1, 6, 4, 6, 35]": 6,
+            "[:then, 2, 6, 4, 6, 16]": 2
+          }
+        }
+      },
+      "/project/safe_navigation.rb": {
+        "lines": [null, null, 1, null, 1, 12, null, null],
+        "branches": {
+          "[:\"&.\", 0, 6, 4, 6, 25]": {
+            "[:then, 1, 6, 4, 6, 25]": 12,
+            "[:else, 2, 6, 4, 6, 25]": 0
+          }
+        }
+      },
+      "/project/ternary.rb": {
+        "lines": [null, null, 1, null, 1, 20, null, null],
+        "branches": {
+          "[:if, 0, 6, 4, 6, 30]": {
+            "[:then, 1, 6, 11, 6, 15]": 10,
+            "[:else, 2, 6, 24, 6, 30]": 10
+          }
+        }
+      },
+      "/project/threshold_test.rb": {
+        "lines": [null, null, 1, null, 1, 100, null, 51, null, 49, null, null],
+        "branches": {
+          "[:if, 0, 6, 4, 10, 7]": {
+            "[:then, 1, 7, 6, 7, 18]": 51,
+            "[:else, 2, 9, 6, 9, 18]": 49
+          }
+        }
+      }
+    },
+    "timestamp": 1700000100
+  }
+}

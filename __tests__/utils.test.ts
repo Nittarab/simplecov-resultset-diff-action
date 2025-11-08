@@ -207,4 +207,89 @@ describe('Utils - Formatting Functions', () => {
       ])
     })
   })
+
+  describe('Multi-suite test framework aggregation', () => {
+    test('handles coverage from 3+ test frameworks correctly', () => {
+      const path = require('path')
+      const {parseResultset} = require('../src/utils')
+      const {Coverage} = require('../src/simplecov')
+
+      const basePath = path.resolve(
+        __dirname,
+        './fixtures/multi_suite_base.json'
+      )
+      const headPath = path.resolve(
+        __dirname,
+        './fixtures/multi_suite_head.json'
+      )
+
+      const baseResultset = parseResultset(basePath)
+      const headResultset = parseResultset(headPath)
+
+      const baseCoverage = new Coverage(baseResultset)
+      const headCoverage = new Coverage(headResultset)
+
+      // Should have merged files from all 3 suites (2 files per suite: shared + suite-specific)
+      expect(baseCoverage.files.length).toBe(6) // RSpec: shared.rb, rspec_only.rb; Minitest: shared.rb, minitest_only.rb; Cucumber: shared.rb, cucumber_only.rb
+      expect(headCoverage.files.length).toBe(6)
+
+      // Find all shared.rb entries (should be 3, one from each suite)
+      const baseSharedFiles = baseCoverage.files.filter(f =>
+        f.filename.includes('shared.rb')
+      )
+      const headSharedFiles = headCoverage.files.filter(f =>
+        f.filename.includes('shared.rb')
+      )
+
+      expect(baseSharedFiles.length).toBe(3)
+      expect(headSharedFiles.length).toBe(3)
+
+      // Verify each suite's coverage of shared.rb
+      // RSpec base: [1,1,1,0,null] = 3/4 = 75%
+      // Minitest base: [1,0,0,1,null] = 2/4 = 50%
+      // Cucumber base: [0,1,0,0,null] = 1/4 = 25%
+      const baseLineCoverages = baseSharedFiles.map(f => f.lines).sort((a, b) => a - b)
+      expect(baseLineCoverages).toEqual([25, 50, 75])
+
+      // RSpec head: [1,1,1,1,null] = 4/4 = 100%
+      // Minitest head: [1,1,0,1,null] = 3/4 = 75%
+      // Cucumber head: [1,1,1,0,null] = 3/4 = 75%
+      const headLineCoverages = headSharedFiles.map(f => f.lines).sort((a, b) => a - b)
+      expect(headLineCoverages).toEqual([75, 75, 100])
+    })
+
+    test('suite-specific files are correctly included', () => {
+      const path = require('path')
+      const {parseResultset} = require('../src/utils')
+      const {Coverage} = require('../src/simplecov')
+
+      const basePath = path.resolve(
+        __dirname,
+        './fixtures/multi_suite_base.json'
+      )
+
+      const baseResultset = parseResultset(basePath)
+      const baseCoverage = new Coverage(baseResultset)
+
+      // Verify each suite-specific file exists
+      const rspecOnly = baseCoverage.files.find(f =>
+        f.filename.includes('rspec_only')
+      )
+      const minitestOnly = baseCoverage.files.find(f =>
+        f.filename.includes('minitest_only')
+      )
+      const cucumberOnly = baseCoverage.files.find(f =>
+        f.filename.includes('cucumber_only')
+      )
+
+      expect(rspecOnly).toBeDefined()
+      expect(minitestOnly).toBeDefined()
+      expect(cucumberOnly).toBeDefined()
+
+      // Verify their coverage
+      expect(rspecOnly!.lines).toBe(100) // [1,1,1] = 3/3
+      expect(minitestOnly!.lines).toBe(66.66) // [1,1,0] = 2/3
+      expect(cucumberOnly!.lines).toBe(66.66) // [1,0,1] = 2/3
+    })
+  })
 })

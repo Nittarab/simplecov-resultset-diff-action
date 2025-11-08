@@ -149,4 +149,102 @@ describe('Integration Tests - Main Run Function', () => {
       expect(mockSetFailed).toHaveBeenCalled()
     })
   })
+
+  describe('large-scale real-world coverage diff', () => {
+    test('should handle gold coverage fixtures with 97 files', async () => {
+      process.env.DRY_RUN = 'true'
+
+      mockGetInput.mockImplementation((input: string) => {
+        switch (input) {
+          case 'base-resultset-path':
+            return path.resolve(
+              __dirname,
+              './fixtures/gold_coverage_base.json'
+            )
+          case 'head-resultset-path':
+            return path.resolve(
+              __dirname,
+              './fixtures/gold_coverage_head.json'
+            )
+          case 'token':
+            return 'test-token'
+          default:
+            return ''
+        }
+      })
+
+      await run()
+
+      expect(mockInfo).toHaveBeenCalledWith(
+        'Running in dry-run mode (DRY_RUN environment variable set)'
+      )
+      expect(mockInfo).toHaveBeenCalledWith('Coverage diff result:')
+
+      // Find the actual diff output
+      const diffCall = mockInfo.mock.calls.find(call =>
+        call[0].includes('Coverage difference')
+      )
+      expect(diffCall).toBeDefined()
+
+      const diffOutput = diffCall?.[0] as string
+
+      // Verify key changes are reflected
+      expect(diffOutput).toContain('Coverage Summary')
+      expect(diffOutput).toContain('File Coverage')
+
+      // Should show new files
+      expect(diffOutput).toContain('🆕')
+      expect(diffOutput).toContain('user_deletion_service.rb')
+      expect(diffOutput).toContain('cleanup_job.rb')
+
+      // Should show deleted files
+      expect(diffOutput).toContain('🗑️')
+      expect(diffOutput).toContain('ai_models_helper.rb')
+      expect(diffOutput).toContain('credits.rake')
+
+      // Should show coverage changes (improved controllers and models)
+      expect(diffOutput).toContain('users_controller.rb')
+      expect(diffOutput).toContain('user.rb')
+      expect(diffOutput).toContain('factual_accuracy_evaluator.rb')
+      expect(diffOutput).toContain('ai.rb')
+    })
+
+    test('should calculate accurate totals for large fixtures', async () => {
+      process.env.DRY_RUN = 'true'
+
+      mockGetInput.mockImplementation((input: string) => {
+        switch (input) {
+          case 'base-resultset-path':
+            return path.resolve(
+              __dirname,
+              './fixtures/gold_coverage_base.json'
+            )
+          case 'head-resultset-path':
+            return path.resolve(
+              __dirname,
+              './fixtures/gold_coverage_head.json'
+            )
+          case 'token':
+            return 'test-token'
+          default:
+            return ''
+        }
+      })
+
+      await run()
+
+      const diffCall = mockInfo.mock.calls.find(call =>
+        call[0].includes('Coverage difference')
+      )
+      const diffOutput = diffCall?.[0] as string
+
+      // Should have summary rows with metrics
+      expect(diffOutput).toMatch(/\|\s*Metric\s*\|/)
+      expect(diffOutput).toMatch(/\|\s*Lines\s*\|/)
+      expect(diffOutput).toMatch(/\|\s*Branches\s*\|/)
+
+      // Should show percentage format
+      expect(diffOutput).toMatch(/\d+\.\d+%/)
+    })
+  })
 })
