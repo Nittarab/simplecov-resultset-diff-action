@@ -216,6 +216,18 @@ For development with auto-rebuilding:
 npm run package:watch
 ```
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## Security
+
+For information about reporting security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
 ## License
 
 MIT
