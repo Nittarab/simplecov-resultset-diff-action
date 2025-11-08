@@ -127,16 +127,28 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
       expect(result).toContain('## File Coverage')
     })
 
-    test('shows only file coverage when total coverage is identical', () => {
-      // This test might need specific fixtures where file-level changes cancel out
-      // For now, we test the structure when there are changes
+    test('shows only file coverage when total coverage unchanged (no summary)', () => {
+      const basePath = path.resolve(
+        __dirname,
+        './fixtures/identical_totals_base.json'
+      )
+      const headPath = path.resolve(
+        __dirname,
+        './fixtures/identical_totals_head.json'
+      )
+
+      // Totals: base covered=2 total=2 (100%), head covered=2 total=2 (100%)
       const result = calculateCoverageDiff({
-        base: fixtures.base,
-        head: fixtures.head
+        base: basePath,
+        head: headPath
       })
 
-      // Should contain both sections when there are differences
-      expect(result).toContain('Coverage difference')
+      // Should not include Coverage Summary section
+      expect(result).not.toContain('## Coverage Summary')
+      // Should include file coverage table due to per-file changes
+      expect(result).toContain('Filename')
+      expect(result).toContain('file1.rb')
+      expect(result).toContain('file2.rb')
     })
   })
 

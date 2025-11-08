@@ -1,0 +1,41 @@
+{
+  "RSpec": {
+    "coverage": {
+      "/project/shared.rb": {
+        "lines": [1, 1, 1, 1, null],
+        "branches": {}
+      },
+      "/project/rspec_only.rb": {
+        "lines": [1, 1, 1],
+        "branches": {}
+      }
+    },
+    "timestamp": 1700000100
+  },
+  "Minitest": {
+    "coverage": {
+      "/project/shared.rb": {
+        "lines": [1, 1, 0, 1, null],
+        "branches": {}
+      },
+      "/project/minitest_only.rb": {
+        "lines": [1, 1, 1],
+        "branches": {}
+      }
+    },
+    "timestamp": 1700000101
+  },
+  "Cucumber": {
+    "coverage": {
+      "/project/shared.rb": {
+        "lines": [1, 1, 1, 0, null],
+        "branches": {}
+      },
+      "/project/cucumber_only.rb": {
+        "lines": [1, 1, 1],
+        "branches": {}
+      }
+    },
+    "timestamp": 1700000102
+  }
+}

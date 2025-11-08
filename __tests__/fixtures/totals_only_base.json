@@ -1,0 +1,27 @@
+{
+  "Minitest": {
+    "coverage": {
+      "/project/small_change1.rb": {
+        "lines": [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        "branches": {}
+      },
+      "/project/small_change2.rb": {
+        "lines": [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        "branches": {}
+      },
+      "/project/small_change3.rb": {
+        "lines": [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        "branches": {}
+      },
+      "/project/small_change4.rb": {
+        "lines": [1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+        "branches": {}
+      },
+      "/project/small_change5.rb": {
+        "lines": [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+        "branches": {}
+      }
+    },
+    "timestamp": 1700000000
+  }
+}
