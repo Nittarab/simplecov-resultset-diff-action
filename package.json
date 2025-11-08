@@ -30,6 +30,10 @@
   ],
   "author": "Kazuki Nishikawa",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
