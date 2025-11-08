@@ -128,8 +128,14 @@ describe('SimpleCov Resultset Diff Action - Core Functionality', () => {
     })
 
     test('shows only file coverage when total coverage unchanged (no summary)', () => {
-      const basePath = path.resolve(__dirname, './fixtures/identical_totals_base.json')
-      const headPath = path.resolve(__dirname, './fixtures/identical_totals_head.json')
+      const basePath = path.resolve(
+        __dirname,
+        './fixtures/identical_totals_base.json'
+      )
+      const headPath = path.resolve(
+        __dirname,
+        './fixtures/identical_totals_head.json'
+      )
 
       // Totals: base covered=2 total=2 (100%), head covered=2 total=2 (100%)
       const result = calculateCoverageDiff({

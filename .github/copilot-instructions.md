@@ -9,6 +9,7 @@ A GitHub Action that compares SimpleCov coverage reports between base and head b
 **Entry Point**: `src/index.ts` → `src/main.ts:run()`
 
 **Core Pipeline**:
+
 1. **Input** → `core.getInput()` reads paths + token from `action.yml`
 2. **Parse** → `utils.ts:parseResultset()` reads JSON files via `fs.readFileSync()`
 3. **Model** → `Coverage` class instances wrap raw data, calculate totals
@@ -40,6 +41,7 @@ A GitHub Action that compares SimpleCov coverage reports between base and head b
 ```
 
 **Coverage calculation** (`simplecov.ts`):
+
 - Line coverage: `covered/total` where `total` excludes `null` entries
 - Branch coverage: Counts all branch keys across all conditions
 - Percentages use `floor(n, 2)` for two-decimal precision
@@ -70,6 +72,7 @@ npm run all                   # format → lint → test → coverage badge → 
 - **Performance tests**: `performance.test.ts` stress-tests large resultsets
 
 **Key patterns**:
+
 - Mock `@actions/core` and `@actions/github` using `jest.mock()` at top of test files
 - Use real SimpleCov fixtures from `__tests__/fixtures/` (not generated data)
 - Test both "diff found" and "no diff" scenarios separately
@@ -77,6 +80,7 @@ npm run all                   # format → lint → test → coverage badge → 
 - Environment: `NODE_ENV=test` switches workspace path from `GITHUB_WORKSPACE` to `/`
 
 **Fixture management**:
+
 - `resultset1.json` / `resultset2.json` - Test pairs with known diffs
 - `old/resultset*.json` - Legacy format fixtures for backward compatibility
 - `not_coverage.json` - Invalid JSON for error path testing
@@ -106,12 +110,14 @@ Set `DRY_RUN=true` or `DRY_RUN=1` environment variable to calculate and log diff
 ## Action Configuration & Deployment
 
 **Inputs** (`action.yml`):
+
 - `base-resultset-path` / `head-resultset-path` - Relative or absolute paths to `.resultset.json`
 - `token` - Optional; if omitted, action runs in implicit dry-run mode (no PR posting)
 
 **Runtime**: Node.js 20 (specified as `using: node20` in `action.yml`)
 
 **Release process**:
+
 1. Update version in `package.json`
 2. Run `npm run all` to rebuild dist/
 3. Commit dist/ changes

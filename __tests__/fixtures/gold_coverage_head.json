@@ -582,12 +582,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/helpers/questions_helper.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          null
-        ],
+        "lines": [null, null, 1, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/helpers/search_runs_helper.rb": {
@@ -652,12 +647,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/helpers/search_tasks_helper.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          null
-        ],
+        "lines": [null, null, 1, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/helpers/users_helper.rb": {
@@ -1089,18 +1079,7 @@
         }
       },
       "/Users/git/private/example_app/app/models/concerns/ai_recordable.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          4,
-          4,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 4, 4, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/concerns/eval.rb": {
@@ -1461,13 +1440,7 @@
         }
       },
       "/Users/git/private/example_app/app/models/application_record.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null
-        ],
+        "lines": [null, null, 1, 1, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/concerns/statuses.rb": {
@@ -2273,17 +2246,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/concerns/citeable.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          1,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 1, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/credit_transaction.rb": {
@@ -2982,19 +2945,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/concerns/annotatable.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          1,
-          null,
-          1,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 1, null, 1, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/models/user_ai_usage.rb": {
@@ -4064,21 +4015,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/controllers/concerns/set_current_request_details.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          2,
-          84,
-          84,
-          84,
-          null,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 2, 84, 84, 84, null, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/controllers/concerns/set_current_user.rb": {
@@ -4269,19 +4206,7 @@
         }
       },
       "/Users/git/private/example_app/app/policies/search_run_policy.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          7,
-          null,
-          null,
-          1,
-          11,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, 7, null, null, 1, 11, null, null],
         "branches": {
           "[:if, 0, 9, 4, 9, 70]": {
             "[:then, 1, 9, 13, 9, 41]": 6,
@@ -5261,20 +5186,7 @@
         }
       },
       "/Users/git/private/example_app/lib/error_logger.rb": {
-        "lines": [
-          null,
-          null,
-          null,
-          1,
-          1,
-          5,
-          null,
-          5,
-          0,
-          null,
-          null,
-          null
-        ],
+        "lines": [null, null, null, 1, 1, 5, null, 5, 0, null, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/controllers/articles_controller.rb": {
@@ -5543,21 +5455,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/jobs/evaluator_job.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          2,
-          2,
-          2,
-          2,
-          null,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 2, 2, 2, 2, null, null, null],
         "branches": {}
       },
       "/Users/git/private/example_app/app/services/question_service.rb": {
@@ -6486,14 +6384,7 @@
         "branches": {}
       },
       "/Users/git/private/example_app/app/mailers/application_mailer.rb": {
-        "lines": [
-          null,
-          null,
-          0,
-          0,
-          0,
-          0
-        ],
+        "lines": [null, null, 0, 0, 0, 0],
         "branches": {}
       },
       "/Users/git/private/example_app/app/services/question_generator_service.rb": {
@@ -6725,21 +6616,7 @@
         }
       },
       "/Users/git/private/example_app/app/jobs/cleanup_job.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          1,
-          null,
-          1,
-          3,
-          null,
-          3,
-          3,
-          3,
-          null,
-          null
-        ],
+        "lines": [null, null, 1, 1, null, 1, 3, null, 3, 3, 3, null, null],
         "branches": {}
       }
     },

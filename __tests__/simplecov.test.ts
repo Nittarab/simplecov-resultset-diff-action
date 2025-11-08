@@ -455,10 +455,24 @@ describe('SimpleCov Coverage Engine', () => {
   describe('Branch pattern coverage scenarios', () => {
     test('handles all Ruby branch types (if, case, unless, &., ternary)', () => {
       const mockResultset = {
-        'RSpec': {
+        RSpec: {
           coverage: {
             '/project/conditional_logic.rb': {
-              lines: [null, null, 1, null, 1, 10, null, 5, null, 5, null, null, null],
+              lines: [
+                null,
+                null,
+                1,
+                null,
+                1,
+                10,
+                null,
+                5,
+                null,
+                5,
+                null,
+                null,
+                null
+              ],
               branches: {
                 '[:if, 0, 6, 4, 10, 7]': {
                   '[:then, 1, 7, 6, 7, 18]': 5,
@@ -467,7 +481,25 @@ describe('SimpleCov Coverage Engine', () => {
               }
             },
             '/project/case_statement.rb': {
-              lines: [null, null, 1, null, 1, 15, null, 3, null, 5, null, 4, null, 3, null, null, null],
+              lines: [
+                null,
+                null,
+                1,
+                null,
+                1,
+                15,
+                null,
+                3,
+                null,
+                5,
+                null,
+                4,
+                null,
+                3,
+                null,
+                null,
+                null
+              ],
               branches: {
                 '[:case, 0, 6, 4, 15, 7]': {
                   '[:when, 1, 7, 6, 7, 16]': 3,
@@ -511,28 +543,51 @@ describe('SimpleCov Coverage Engine', () => {
       const coverage = new Coverage(mockResultset)
 
       // Verify all branch patterns are detected and calculated correctly
-      const conditional = coverage.files.find(f => f.filename === '/project/conditional_logic.rb')
+      const conditional = coverage.files.find(
+        f => f.filename === '/project/conditional_logic.rb'
+      )
       expect(conditional?.branches).toBe(100) // 2/2 branches covered
 
-      const caseStmt = coverage.files.find(f => f.filename === '/project/case_statement.rb')
+      const caseStmt = coverage.files.find(
+        f => f.filename === '/project/case_statement.rb'
+      )
       expect(caseStmt?.branches).toBe(100) // 4/4 branches covered
 
-      const unlessGuard = coverage.files.find(f => f.filename === '/project/unless_guard.rb')
+      const unlessGuard = coverage.files.find(
+        f => f.filename === '/project/unless_guard.rb'
+      )
       expect(unlessGuard?.branches).toBe(50) // 1/2 branches covered
 
-      const safeNav = coverage.files.find(f => f.filename === '/project/safe_navigation.rb')
+      const safeNav = coverage.files.find(
+        f => f.filename === '/project/safe_navigation.rb'
+      )
       expect(safeNav?.branches).toBe(100) // 2/2 branches covered
 
-      const ternary = coverage.files.find(f => f.filename === '/project/ternary.rb')
+      const ternary = coverage.files.find(
+        f => f.filename === '/project/ternary.rb'
+      )
       expect(ternary?.branches).toBe(100) // 2/2 branches covered
     })
 
     test('branch hit count changes without percentage change (still 100%)', () => {
       const baseResultset = {
-        'RSpec': {
+        RSpec: {
           coverage: {
             '/project/threshold.rb': {
-              lines: [null, null, 1, null, 1, 100, null, 50, null, 50, null, null],
+              lines: [
+                null,
+                null,
+                1,
+                null,
+                1,
+                100,
+                null,
+                50,
+                null,
+                50,
+                null,
+                null
+              ],
               branches: {
                 '[:if, 0, 6, 4, 10, 7]': {
                   '[:then, 1, 7, 6, 7, 18]': 50,
@@ -545,10 +600,23 @@ describe('SimpleCov Coverage Engine', () => {
       }
 
       const headResultset = {
-        'RSpec': {
+        RSpec: {
           coverage: {
             '/project/threshold.rb': {
-              lines: [null, null, 1, null, 1, 100, null, 51, null, 49, null, null],
+              lines: [
+                null,
+                null,
+                1,
+                null,
+                1,
+                100,
+                null,
+                51,
+                null,
+                49,
+                null,
+                null
+              ],
               branches: {
                 '[:if, 0, 6, 4, 10, 7]': {
                   '[:then, 1, 7, 6, 7, 18]': 51,
@@ -573,7 +641,7 @@ describe('SimpleCov Coverage Engine', () => {
 
     test('detects line coverage increase with branch coverage decrease', () => {
       const baseResultset = {
-        'RSpec': {
+        RSpec: {
           coverage: {
             '/project/mixed.rb': {
               lines: [null, null, 1, null, 1, 10, null, 5, null, 0, null, null],
@@ -589,7 +657,7 @@ describe('SimpleCov Coverage Engine', () => {
       }
 
       const headResultset = {
-        'RSpec': {
+        RSpec: {
           coverage: {
             '/project/mixed.rb': {
               lines: [null, null, 1, null, 1, 10, null, 8, null, 2, null, null],

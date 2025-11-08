@@ -248,13 +248,17 @@ describe('Utils - Formatting Functions', () => {
       // RSpec base: [1,1,1,0,null] = 3/4 = 75%
       // Minitest base: [1,0,0,1,null] = 2/4 = 50%
       // Cucumber base: [0,1,0,0,null] = 1/4 = 25%
-      const baseLineCoverages = baseSharedFiles.map(f => f.lines).sort((a, b) => a - b)
+      const baseLineCoverages = baseSharedFiles
+        .map(f => f.lines)
+        .sort((a, b) => a - b)
       expect(baseLineCoverages).toEqual([25, 50, 75])
 
       // RSpec head: [1,1,1,1,null] = 4/4 = 100%
       // Minitest head: [1,1,0,1,null] = 3/4 = 75%
       // Cucumber head: [1,1,1,0,null] = 3/4 = 75%
-      const headLineCoverages = headSharedFiles.map(f => f.lines).sort((a, b) => a - b)
+      const headLineCoverages = headSharedFiles
+        .map(f => f.lines)
+        .sort((a, b) => a - b)
       expect(headLineCoverages).toEqual([75, 75, 100])
     })
 

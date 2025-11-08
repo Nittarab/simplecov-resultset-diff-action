@@ -157,15 +157,9 @@ describe('Integration Tests - Main Run Function', () => {
       mockGetInput.mockImplementation((input: string) => {
         switch (input) {
           case 'base-resultset-path':
-            return path.resolve(
-              __dirname,
-              './fixtures/gold_coverage_base.json'
-            )
+            return path.resolve(__dirname, './fixtures/gold_coverage_base.json')
           case 'head-resultset-path':
-            return path.resolve(
-              __dirname,
-              './fixtures/gold_coverage_head.json'
-            )
+            return path.resolve(__dirname, './fixtures/gold_coverage_head.json')
           case 'token':
             return 'test-token'
           default:
@@ -215,15 +209,9 @@ describe('Integration Tests - Main Run Function', () => {
       mockGetInput.mockImplementation((input: string) => {
         switch (input) {
           case 'base-resultset-path':
-            return path.resolve(
-              __dirname,
-              './fixtures/gold_coverage_base.json'
-            )
+            return path.resolve(__dirname, './fixtures/gold_coverage_base.json')
           case 'head-resultset-path':
-            return path.resolve(
-              __dirname,
-              './fixtures/gold_coverage_head.json'
-            )
+            return path.resolve(__dirname, './fixtures/gold_coverage_head.json')
           case 'token':
             return 'test-token'
           default:
